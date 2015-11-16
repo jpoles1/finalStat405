@@ -52,8 +52,9 @@ fetchVote = function(congressNumber=113, chamber="senate", sessionNumber = 1, ro
   return(data) 
 }
 fetchXML = function(url){
-  rawtext = getURL(url);
-  data = xmlToList(rawtext);
+  rawtext = getURL(dataurl);
+  data = xmlToList(rawtext)$votes;
+  d = ldply(data, function(x) data.frame(x))
 }
 senateRollCall = function(congressNumber=113, sessionNumber=1){
   dataurl = sprintf("http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_%s_%s.xml", congressNumber, sessionNumber)
@@ -61,6 +62,5 @@ senateRollCall = function(congressNumber=113, sessionNumber=1){
   return(data);
 }
 x = senateRollCall();
-View(x)
 memberData = fetchAllMembers(80:113)
 fetchBills(111)
