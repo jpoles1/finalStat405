@@ -1,18 +1,36 @@
-\documentclass{article}
-
+\documentclass[10pt]{article}
+\usepackage[left=1cm,right=1cm,top=2cm,bottom=2cm]{geometry}
+\usepackage{amsmath}
 \begin{document}
-\SweaveOpts{concordance=TRUE}
-
+\title{Analyzing Roll Call Votes from the US Senate}
+\author{Jordan Poles}
+\maketitle
 <<>>=
 #Setting up libraries and imports
   require(RSQLite)
   require(ggplot2)
-  source("voteAnalysis.R")
+  source("../config.R")
+  source("../voteAnalysis.R")
 @
-<<>>=
+\newpage
+<<tidy=TRUE>>=
   query = "SELECT party, count(*) as ct FROM votes GROUP BY party"
-  partyVoteTotals = queryDB(query)
-  ggplot(partyVoteTotals, aes(x=reorder(party, ct), y=ct))+geom_bar(stat="identity")+ggtitle("Total Number of Votes by Party")
+  partyVoteTotals = queryDB(query, "data.sqlite")
+  ggplot(partyVoteTotals, aes(x=reorder(party, ct), y=ct))+geom_bar(stat="identity")+ggtitle(sprintf("Total Number of Votes by Party\nTotal Votes: %s", sum(partyVoteTotals$ct)))
 @
-
+\newpage
+<<tidy=TRUE>>=
+  query = "SELECT id, first_name, last_name, party, seniority, count(*) AS ct FROM members GROUP BY id ORDER BY ct DESC"
+  senatorTotals = queryDB(query, "data.sqlite")
+  ggplot(senatorTotals, aes(x=ct))+xlim(1, 14)+geom_bar(binwidth=.5)+xlab("Number of Terms")+ylab("Count")+ggtitle("Distribution of Terms Served in 101st to 113th Senates")
+@
+\newpage
+<<tidy=TRUE>>=
+  query = "SELECT yeas, nays, (yeas+nays) as total, (100*(yeas-nays)/(yeas+nays)) as voteDiff, congressNumber, session as sessionNumber FROM senateRollCalls"
+  rollCallStats = queryDB(query, "data.sqlite")
+  rollCallStats$year = apply(rollCallStats, 1, function(x){
+    congressToYear(x["congressNumber"], x["sessionNumber"])
+  })
+  ggplot(rollCallStats, aes(x=as.factor(year), y=voteDiff))+geom_boxplot()+geom_smooth(aes(group=1), method="lm")+geom_point(alpha=.1)+ggtitle("Roll-call Vote Disagreement by Year\n")+xlab("\nYear")+ylab("Percentage Difference\n100*(Yea-Nay)/Total")
+@
 \end{document}
