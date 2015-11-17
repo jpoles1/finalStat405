@@ -19,6 +19,8 @@ fetchSenateRollCalls = function(congressRange, sessionRange){
       data = rbind.fill(data, set)
     }
   }
+  data = data[,2:16]
+  colnames(data) = c("voteNumber", "date", "issueID", "issueURL", "question", "result", "yeas", "nays", "title", "questionType", "questionReference", "questionReferenceURL", "issueOther", "congressNumber", "session")
   tableWriter(data, "senateRollCalls")
   return(data);
 }

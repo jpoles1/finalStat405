@@ -1,0 +1,1 @@
+#Going to get started analyzing some trends here

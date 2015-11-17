@@ -62,10 +62,10 @@ fetchVote = function(congressNumber=113, year = 2015, rollNumber=1, searchparams
   return(data);
 }
 fetchVotes = function(rollCallData){
-  rollCallColnames = c("congressNumber", "session", "vote_number")
+  rollCallColnames = c("congressNumber", "session", "voteNumber")
   rollCalls = rollCallData[rollCallColnames]
   data = ddply(rollCalls, rollCallColnames, function(x){
-    rollNumber = x$vote_number;
+    rollNumber = x$voteNumber;
     rollNumber = gsub("0", "", as.character(rollNumber))
     year = sesh[sesh$congress==x$congressNumber,]$session[x$session]
     set = fetchVote(x$congressNumber, year, rollNumber)
@@ -77,6 +77,12 @@ fetchVotes = function(rollCallData){
     set
   });
   data = data[,1:12];
+  nms = colnames(data)
+  nms[2] = "vote"
+  nms[3] = "displayName"
+  nms[4] = "firstName"
+  nms[6] = "lastName"
+  colnames(data) = nms;
   try(tableWriter(data, "votes"));
   return(data)
 }
