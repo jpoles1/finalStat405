@@ -7,7 +7,8 @@ We have finally gotten our database up and running. It includes 3 tables:
   - Also contains a value for the percentage of votes with party majority
   - Social media accounts, websites
 - Senate Roll Call Votes (senateRollCalls)
+  -  Lots of data, some useful like tallies of votes, others less so.
 - Individual Votes (votes)
--   - Metadata like roll-call vote number (rollNumber), Name, State, Party
+  - Metadata like roll-call vote number (rollNumber), Name, State, Party
   - Timescale data: congress number, session, year
   - vote (yea, nay, not voting)
