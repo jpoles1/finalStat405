@@ -8,6 +8,8 @@ require(plyr)
 #Loading in API key from config
 source("config.R")
 source("senateRollCall.R")
+#Fetch session data for determining which years align with a given congress session
+sesh = read.delim("data/sessions.tsv")
 #Helper Functions
 fetchJSON = function(url){
   i = 1;
@@ -53,25 +55,32 @@ fetchBills = function(congressNumber=113, chamber="senate", searchparams=""){
   data = fetchJSON(dataurl)$results
   return(data) 
 }
-fetchVote = function(congressNumber=113, sessionNumber = 1, rollNumber=1, chamber="senate", searchparams=""){
-  dataurl = sprintf("http://api.nytimes.com/svc/politics/%s/us/legislative/congress/%s/%s/sessions/%s/votes/%s.json?%s&api-key=%s", apiversion, congressNumber, chamber, sessionNumber, rollNumber, searchparams, apikey)
+fetchVote = function(congressNumber=113, year = 2015, rollNumber=1, searchparams=""){
+  dataurl = sprintf("https://www.govtrack.us/data/congress/%s/votes/%s/s%s/data.json", congressNumber, year, rollNumber)
   print(dataurl)
   data = fetchJSON(dataurl)
-  return(data) 
+  return(data);
 }
 fetchVotes = function(rollCallData){
   rollCallColnames = c("congressNumber", "session", "vote_number")
   rollCalls = rollCallData[rollCallColnames]
   data = ddply(rollCalls, rollCallColnames, function(x){
-    fetchVote(x$congressNumber, x$session, x$vote_number);
-    y = fetchVote(x$congressNumber, x$session, x$vote_number)$results$votes$vote
-    d = y[names(y) %in% c("democratic", "republican", "independent")]
-    ldply(d, function(x)data.frame(x))
+    rollNumber = x$vote_number;
+    rollNumber = gsub("0", "", as.character(rollNumber))
+    year = sesh[sesh$congress==x$congressNumber,]$session[x$session]
+    set = fetchVote(x$congressNumber, year, rollNumber)
+    set = ldply(set$votes, function(x) data.frame(x))
+    set$congressNumber = x$congressNumber;
+    set$session = x$session;
+    set$year = year;
+    set$rollNumber = rollNumber;
+    set
   });
-  tableWriter(data, "votes")
+  data = data[,1:12];
+  try(tableWriter(data, "votes"));
   return(data)
 }
-rollCallData = fetchSenateRollCalls(101:113, 1:2);
+range = 101:113
+memberData = fetchAllMembers(range)
+rollCallData = fetchSenateRollCalls(range, 1:2);
 voteData = fetchVotes(rollCallData);
-memberData = fetchAllMembers(101:113)
-#fetchBills(111)

@@ -6,6 +6,7 @@ fetchXML = function(dataurl){
 senateRollCall = function(congressNumber=113, sessionNumber=1){
   dataurl = sprintf("http://www.senate.gov/legislative/LIS/roll_call_lists/vote_menu_%s_%s.xml", congressNumber, sessionNumber)
   data = fetchXML(dataurl);
+  print("Fetch succeeded")
   return(data);
 }
 fetchSenateRollCalls = function(congressRange, sessionRange){
