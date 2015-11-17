@@ -1,0 +1,18 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+<<>>=
+#Setting up libraries and imports
+  require(RSQLite)
+  require(ggplot2)
+  source("voteAnalysis.R")
+@
+<<>>=
+  query = "SELECT party, count(*) as ct FROM votes GROUP BY party"
+  partyVoteTotals = queryDB(query)
+  ggplot(partyVoteTotals, aes(x=reorder(party, ct), y=ct))+geom_bar(stat="identity")+ggtitle("Total Number of Votes by Party")
+@
+
+\end{document}

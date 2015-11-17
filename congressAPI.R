@@ -4,7 +4,6 @@ require(jsonlite)
 require(plyr)
 require(RSQLite)
 require(XML)
-require(plyr)
 #Loading in API key from config
 source("config.R")
 source("senateRollCall.R")
