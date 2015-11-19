@@ -9,7 +9,7 @@
 #Setting up libraries and imports
   require(RSQLite)
   require(ggplot2)
-  source("../config.R")
+  source("../sampleconfig.R")
   source("../voteAnalysis.R")
 @
 \newpage
@@ -32,5 +32,32 @@
     congressToYear(x["congressNumber"], x["sessionNumber"])
   })
   ggplot(rollCallStats, aes(x=as.factor(year), y=voteDiff))+geom_boxplot()+geom_smooth(aes(group=1), method="lm")+geom_point(alpha=.1)+ggtitle("Roll-call Vote Disagreement by Year\n")+xlab("\nYear")+ylab("Percentage Difference\n100*(Yea-Nay)/Total")
+@
+\newpage
+<<tidy=FALSE>>==
+  query = "select r.year as year, r.voteNumber as voteNumber,
+              abs(r.c - d.c) * 1.0 / (r.c + d.c) as diff 
+           from (select voteNumber, year, count(*) as c
+                 from votes 
+                 where vote == 'Yea' and party == 'R' group by year, voteNumber)
+                 as r
+                join
+	              (select voteNumber, year, count(*) as c 
+                 from votes 
+                 where vote == 'Yea' and party == 'D' group by year, voteNumber)
+                 as d
+	              on r.voteNumber == d.voteNumber and r.year == d.year"
+  yeaDiff = queryDB(query, "data.sqlite")
+  yeaDiffMean = setNames(aggregate(diff ~ year, yeaDiff, mean), c("year", "mean"))
+  yeaDiffSd = setNames(aggregate(diff ~ year, yeaDiff, sd), c("year", "std"))
+  yeaDiffDistribution = merge(yeaDiffMean, yeaDiffSd, by="year")
+  ggplot(yeaDiffDistribution) +
+  aes(x = year, y = mean) +
+  scale_x_discrete(breaks=c(1989,1994,1999,2004,2009,2014)) +
+  labs(title="Mean of difference of 'yea' votes of two majority parties 
+       \ndivided by total 'yea' votes from 1989 to 2014") +
+  xlab("Year") +
+  ylab("Mean difference of each year") +
+  geom_bar(stat="identity")
 @
 \end{document}
