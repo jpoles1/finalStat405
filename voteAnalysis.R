@@ -13,3 +13,4 @@ congressToYear = function(congressNumber, sessionNumber){
   year = sesh[sesh$congress==congressNumber,]$session[sessionNumber]
   return(as.integer(as.character(year)))
 }
+#Scratch space

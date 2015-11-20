@@ -9,9 +9,25 @@
 #Setting up libraries and imports
   require(RSQLite)
   require(ggplot2)
-  library(grid);
+  require(grid)
+  require(reshape2)
   source("../config.R")
   source("../voteAnalysis.R")
+@
+\newpage
+<<tide=TRUE>>=
+  websiteCt = queryDB("SELECT party as Party, congressNumber, count(*) as webct FROM members WHERE URL!='' AND Party!='I' GROUP BY party, congressNumber")
+  twitterCt = queryDB("SELECT party as Party, congressNumber, count(*) as twitterct FROM members WHERE twitter_account!='' AND Party!='I' GROUP BY party, congressNumber")
+  fbCt = queryDB("SELECT party as Party, congressNumber, count(*) as fbct FROM members WHERE facebook_account!='' AND Party!='I' GROUP BY party, congressNumber")
+  totalCt = queryDB("SELECT party as Party, congressNumber, count(*) as totalct FROM members WHERE Party!='I' GROUP BY party, congressNumber")
+  mediaCt = merge(websiteCt, twitterCt, by=c("Party", "congressNumber"))
+  mediaCt = merge(mediaCt, fbCt, by=c("Party", "congressNumber"))
+  mediaCt = merge(mediaCt, totalCt, by=c("Party", "congressNumber"))
+  mediaCt$Website = mediaCt$webct/mediaCt$totalct
+  mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
+  mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
+  mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
+  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+geom_point()+geom_line()+facet_wrap(~variable)+xlim(101, 113)+xlab("Congress Number")+ylab("Proportion of Senators in Party")+ggtitle("Web Platform Usage By Senators")
 @
 \newpage
 <<tidy=TRUE>>=
