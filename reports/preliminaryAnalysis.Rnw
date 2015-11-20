@@ -9,7 +9,8 @@
 #Setting up libraries and imports
   require(RSQLite)
   require(ggplot2)
-  source("../sampleconfig.R")
+  library(grid);
+  source("../config.R")
   source("../voteAnalysis.R")
 @
 \newpage
@@ -59,5 +60,19 @@
   xlab("Year") +
   ylab("Mean difference of each year") +
   geom_bar(stat="identity")
+@
+\newpage
+<<>>=
+  partyData = queryDB("SELECT party as Party, count(*) as ct FROM members WHERE party!='ID' GROUP BY party")
+  a = ggplot(partyData, aes(x=reorder(Party, ct), y=ct))+geom_bar(stat="identity", fill=c("green", "red", "#4169E1"))+xlab("Party")+ylab("Number of Seats Held")+ggtitle("US Senate Seats\nDominated by Two Major Parties")
+  independentDataByYear = queryDB("SELECT party as Party, congressNumber, count(*) as ct FROM members WHERE party=='I' GROUP BY party, congressNumber")
+  b=ggplot(independentDataByYear, aes(x=congressNumber, y=ct))+geom_point()+geom_line()+ggtitle("")+ylim(0,5)+xlab("Congress Number")+ylab("Number of Seats")+ggtitle("Independents are a Non-Growing\nMinority of Seats")
+  partyDataByYear = queryDB("SELECT party as Party, congressNumber, count(*) as ct FROM members WHERE party!='ID' GROUP BY party, congressNumber")
+  c = ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+scale_fill_manual(name = "Party", values = c("#4169E1", "green", "#FF0000"))+geom_histogram(position="fill", stat="identity", width=1)+xlab("Congress Number\n")+scale_x_continuous(breaks=101:113)+ylab("\nPercentage of Senate Seats")+ggtitle("Senate Seats Held Per Party By Year\n")
+  grid.newpage()
+  pushViewport(viewport(layout=grid.layout(2, 2)))
+  print(a, vp = viewport(layout.pos.row=1, layout.pos.col=1))
+  print(b, vp = viewport(layout.pos.row=1, layout.pos.col=2))
+  print(c, vp = viewport(layout.pos.row=2, layout.pos.col=1:2))
 @
 \end{document}
