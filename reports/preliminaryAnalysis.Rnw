@@ -91,4 +91,27 @@
   print(b, vp = viewport(layout.pos.row=1, layout.pos.col=2))
   print(c, vp = viewport(layout.pos.row=2, layout.pos.col=1:2))
 @
+\newpage
+<<tidy=FALSE>>==
+  passedQuery <- "select 'Pass' as res, congressNumber, count(*) as cnt 
+            from senateRollCalls 
+            where result == 'Agreed to'
+                  or result == 'Confirmed'
+                  or result == 'Passed' 
+            group by congressNumber"
+  passedResults <- queryDB(passedQuery, "data.sqlite")
+  failedQuery <- "select 'Fail' as res, congressNumber, count(*) as cnt 
+            from senateRollCalls 
+            where result == 'Rejected'
+            group by congressNumber"
+  failedResults <- queryDB(failedQuery, "data.sqlite")
+  results <- rbind(passedResults, failedResults)
+  ggplot(results) + aes(x=congressNumber, y=cnt, fill=res) +
+    geom_histogram(position="fill", stat="identity", width=1) +
+    scale_fill_manual(name = "res", values = c("red", "green")) +
+    xlab("Congress Number\n") +
+    scale_x_continuous(breaks=101:113) +
+    ylab("\nPercentage of positive and negative results of bills") +
+    ggtitle("Passed/failed bills count By Year\n")
+@
 \end{document}
