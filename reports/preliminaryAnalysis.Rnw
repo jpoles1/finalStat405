@@ -27,7 +27,7 @@
   mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
   mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
   mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
-  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+geom_point()+geom_line()+facet_wrap(~variable)+xlim(101, 113)+xlab("Congress Number")+ylab("Proportion of Senators in Party")+ggtitle("Web Platform Usage By Senators")
+  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+geom_point()+geom_line()+facet_wrap(~variable)+xlim(100, 113)+xlab("\nCongress Number")+ylab("Proportion of Senators in Party\n")+ggtitle("Proportion of Senators Who Have Ever Used a Web Platform In Their Political Career\n")
 @
 \newpage
 <<tidy=TRUE>>=
@@ -84,7 +84,7 @@
   independentDataByYear = queryDB("SELECT party as Party, congressNumber, count(*) as ct FROM members WHERE party=='I' GROUP BY party, congressNumber")
   b=ggplot(independentDataByYear, aes(x=congressNumber, y=ct))+geom_point()+geom_line()+ggtitle("")+ylim(0,5)+xlab("Congress Number")+ylab("Number of Seats")+ggtitle("Independents are a Non-Growing\nMinority of Seats")
   partyDataByYear = queryDB("SELECT party as Party, congressNumber, count(*) as ct FROM members WHERE party!='ID' GROUP BY party, congressNumber")
-  c = ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+scale_fill_manual(name = "Party", values = c("#4169E1", "green", "#FF0000"))+geom_histogram(position="fill", stat="identity", width=1)+xlab("Congress Number\n")+scale_x_continuous(breaks=101:113)+ylab("\nPercentage of Senate Seats")+ggtitle("Senate Seats Held Per Party By Year\n")
+  c = ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+scale_fill_manual(name = "Party", values = c("#4169E1", "green", "#FF0000"))+geom_histogram(position="fill", stat="identity", width=1)+xlab("\nCongress Number")+scale_x_continuous(breaks=101:113)+ylab("Proportion of Senate Seats\n")+ggtitle("Senate Seats Held Per Party Is Fairly Stable over Time\n")
   grid.newpage()
   pushViewport(viewport(layout=grid.layout(2, 2)))
   print(a, vp = viewport(layout.pos.row=1, layout.pos.col=1))
