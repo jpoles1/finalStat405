@@ -114,4 +114,22 @@
     ylab("\nPercentage of positive and negative results of bills") +
     ggtitle("Passed/failed bills count By Year\n")
 @
+\newpage
+<<tidy=FALSE>>==
+  query <- "select * from
+            (select questionType, count(*) as cnt 
+             from senateRollCalls 
+             where questionType not null
+             group by questionType)
+           where cnt > 10"
+  type <- queryDB(query, "data.sqlite")
+  ggplot(type) +
+  aes(x = questionType, y = cnt) +
+  labs(title="Bill counts for different bill types") +
+  xlab("Bill type") +
+  ylab("Counts") +
+  geom_bar(stat="identity") +
+  theme(text = element_text(size=10),
+      axis.text.x = element_text(angle=90, hjust = 1)) 
+@
 \end{document}
