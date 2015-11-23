@@ -122,10 +122,28 @@
     ggtitle("Passed/failed bills count By Year\n")
 @
 \newpage
+<<<<<<< HEAD
 <<>>==
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
   memberPct$withParty = as.integer(as.character(memberPct$withParty))
   memberPct$congressNumber = as.factor(memberPct$congressNumber)
   ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+geom_boxplot()+xlab("Congress Number")+ylab("Percentage of Votes With Party")+scale_fill_manual(values = c("royal blue", "red"))+ggtitle("% of Senator Votes With Party Are Unstable Over Time")
+@
+<<tidy=FALSE>>==
+  query <- "select * from
+            (select questionType, count(*) as cnt 
+             from senateRollCalls 
+             where questionType not null
+             group by questionType)
+           where cnt > 10"
+  type <- queryDB(query, "data.sqlite")
+  ggplot(type) +
+  aes(x = questionType, y = cnt) +
+  labs(title="Bill counts for different bill types") +
+  xlab("Bill type") +
+  ylab("Counts") +
+  geom_bar(stat="identity") +
+  theme(text = element_text(size=10),
+      axis.text.x = element_text(angle=90, hjust = 1)) 
 @
 \end{document}
