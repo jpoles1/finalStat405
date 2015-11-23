@@ -42,6 +42,13 @@
   ggplot(senatorTotals, aes(x=ct))+xlim(1, 14)+geom_bar(binwidth=.5)+xlab("Number of Terms")+ylab("Count")+ggtitle("Distribution of Terms Served in 101st to 113th Senates")
 @
 \newpage
+<<>>==
+  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
+  votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
+  votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
+  ggplot(votedatawide, aes(x=year, y=diff))+geom_boxplot()+geom_jitter(aes(color=party), alpha=.8)+scale_color_manual(values=c("royal blue", "red"))+xlab("\nYear")+ylab("Difference between Number of Yea/Nay Votes By Senator\n")
+@
+\newpage
 <<tidy=TRUE>>=
   query = "SELECT yeas, nays, (yeas+nays) as total, (100*(yeas-nays)/(yeas+nays)) as voteDiff, congressNumber, session as sessionNumber FROM senateRollCalls"
   rollCallStats = queryDB(query, "data.sqlite")
@@ -113,5 +120,12 @@
     scale_x_continuous(breaks=101:113) +
     ylab("\nPercentage of positive and negative results of bills") +
     ggtitle("Passed/failed bills count By Year\n")
+@
+\newpage
+<<>>==
+  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
+  memberPct$withParty = as.integer(as.character(memberPct$withParty))
+  memberPct$congressNumber = as.factor(memberPct$congressNumber)
+  ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+geom_boxplot()+xlab("Congress Number")+ylab("Percentage of Votes With Party")+scale_fill_manual(values = c("royal blue", "red"))+ggtitle("% of Senator Votes With Party Are Unstable Over Time")
 @
 \end{document}
