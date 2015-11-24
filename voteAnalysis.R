@@ -13,7 +13,7 @@ congressToYear = function(congressNumber, sessionNumber){
   year = sesh[sesh$congress==congressNumber,]$session[sessionNumber]
   return(as.integer(as.character(year)))
 }
-stateTable = read.csv("data/stateTable.csv")
+stateTable = read.csv(paste(projectRoot,"data/stateTable.csv", sep=""))
 stateAbrevToFull = function(abrev){
   return(tolower(stateTable[stateTable$abbreviation==abrev, "name"]))
 }
