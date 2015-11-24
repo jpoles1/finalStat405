@@ -132,4 +132,25 @@
   theme(text = element_text(size=10),
       axis.text.x = element_text(angle=90, hjust = 1)) 
 @
+\newpage
+<<tidy=FALSE>>==
+  library(reshape2)
+  query <- "select pass, fail, p.congressNumber 
+            from
+            (select congressNumber, count(*) as pass 
+             from senateRollCalls 
+             where  CAST(nays as INTEGER) <= 5 
+             group by congressNumber) as p
+            join
+            (select congressNumber, count(*) as fail 
+             from senateRollCalls 
+             where  CAST(yeas as INTEGER) <= 5 
+             group by congressNumber) as f
+            on p.congressNumber == f.congressNumber"
+  unanimous <- queryDB(query, "data.sqlite")
+  unanimous$congressNumber <- factor(unanimous$congressNumber)
+  unanimous <- melt(unanimous[,c('congressNumber','pass','fail')],id.vars = 1)
+  ggplot(unanimous,aes(x = congressNumber,y = value)) + 
+    geom_bar(stat='identity',aes(fill = variable),position = "dodge")
+@
 \end{document}
