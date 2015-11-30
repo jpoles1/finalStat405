@@ -35,6 +35,7 @@ The US government is said to be by the people, of the people, and for the people
   require(ggplot2)
   require(grid)
   require(reshape2)
+  require(xtable)
   source("../config.R")
   source("../voteAnalysis.R")
 @
@@ -43,7 +44,7 @@ The US government is said to be by the people, of the people, and for the people
 \subsubsection*{Introduction to US Political Parties}
 The subsequent figure is the culmination of an analysis of the power held by each of the political parties in the US Senate. We confirm the prevailing understanding of American politics as a system dominated by two major political parties - a bipartisan system. In recent years, an independent party has emerged. However, since then the party has not grown significantly; they have never held more than 2 seats. There is one minor party featured in this plot, the Iowa Democrats, who are an offshoot of the Democratic party. They have only ever held two seats in the US Senate, but do hold a good deal of power in the state; the party also has a noteworthy involvement in the Iowa Caucuses, which are important for presidential elections (\href{http://iowademocrats.org/}{http://iowademocrats.org/}).
 
-<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
+<<echo=FALSE, out.height="5.5in", out.width="8in", fig.width=8, fig.height=5.5, cache=TRUE>>=
   partyDataByYear = queryDB("
     SELECT party as Party, congressNumber, count(*) as ct
     FROM members
@@ -57,8 +58,19 @@ The subsequent figure is the culmination of an analysis of the power held by eac
     ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time", 
       atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
 @
+\subsubsection*{Common Senatorial Surnames}
+We find that there are 12 surnames held by more than one senator; these are shown below. Several of these pairs of senators are related to one another. 
+<<echo=FALSE, results='asis'>>==
+  lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC")
+  lastCounts = lastCounts[lastCounts$lastct>1,]
+  colnames(lastCounts) = c("Last Name", "# of Senators")
+  print(xtable(t(lastCounts)))
+@
 \newpage
-<<out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE>>=
+\subsubsection*{Examining State Party Preferences}
+Over the course of the period examined, many states elected similar numbers of senators from both major parties (purple); these are states in which senatorial elections may be more contentious. Those states shown in red represent a Republican majority; blue a Democratic majority. The steadfast democratic states are primarily found in the Northeast, while several states in the South and Middle of America are dominated by the Republican party.
+
+<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE>>=
   stateParty = queryDB("
     SELECT state as stateAbrev, party, count(*) as ct
     FROM members
@@ -75,17 +87,31 @@ The subsequent figure is the culmination of an analysis of the power held by eac
     scale_fill_gradient(name="Party Difference\n(# Senators)", low="red", high="navy blue", 
       guide="legend", limits=c(-30, 30), breaks=seq(-30, 30, length.out = 9))+
     ggtitle(expression(atop("Party Preferences By State as Determined by Senate Seats", 
-      atop(italic("Data From 1989 to 2014"), "Republicans (Red) vs. Democrats (Blue)"))))
+      atop(italic("Data From 1989 to 2014"), "Republicans (Red) vs. Democrats (Blue)"))))+
+    xlab("")+ylab("")+
+    scale_x_continuous(breaks=NULL)+
+    scale_y_continuous(breaks=NULL)
 @
-<<out.height="2in", out.width="8in", fig.width=8, fig.height=2, echo=FALSE>>==
+<<out.height="2in", out.width="8in", fig.width=8, fig.height=2, echo=FALSE, eval=FALSE>>==
   stateParty = queryDB(paste("SELECT state as stateAbrev, party, count(*) as ct", "FROM members", "WHERE party IN ('D', 'R', 'I') GROUP BY party, state"))
   stateParty$state = apply(stateParty, 1, FUN=function(x){stateAbrevToFull(x["stateAbrev"])})
   stateMap = map_data("state")
   ggplot()+
-    geom_map(data=stateMap, map=stateMap, aes(x=long, y=lat, map_id=region), fill="#ffffff", color="grey10")+
-    geom_map(data=stateParty, map=stateMap, aes(fill=ct, map_id=state), color="grey10")+
+    geom_map(data=stateMap, map=stateMap, aes(x=long, y=lat, map_id=region), fill="grey5", color="grey20")+
+    geom_map(data=stateParty, map=stateMap, aes(fill=ct, map_id=state))+
     facet_wrap(~party)+
-    scale_fill_gradient(name="# Senators", low="yellow", high="red")
+    scale_fill_gradient(name="# Senators", low="yellow", high="red")+
+    xlab("")+ylab("")+
+    scale_x_continuous(breaks=NULL)+
+    scale_y_continuous(breaks=NULL)
+@
+\subsubsection*{Indepdendent Senators}
+Given that they are a small cohort, we thought that the independent senators deserved some analytical consideration. We note that the majority of elections won by independent senators are in the state of Vermont (VT), and that there are a small overall number of candidates per # of elections won. Senator Barkley had a small number of votes; further research revealed that he temporarily held the chair of another senator who had died in a plane crash.
+
+<<echo=FALSE, results='asis'>>==
+  indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state")
+  colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
+  print(xtable(indep))
 @
 \newpage
 <<tidy=TRUE, out.height="6in", out.width="8in", fig.width=8, fig.height=6>>=
