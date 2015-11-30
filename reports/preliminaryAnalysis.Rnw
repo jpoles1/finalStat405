@@ -1,11 +1,35 @@
 \documentclass[10pt]{article}
-\usepackage[left=.5cm,right=.5cm,top=1cm,bottom=1cm]{geometry}
+\usepackage[left=1cm,right=1cm,top=1cm,bottom=1cm]{geometry}
 \usepackage{amsmath}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{hyperref}
+\hypersetup{
+  urlcolor=blue,
+  colorlinks=true
+}
 \begin{document}
-\title{Analyzing Roll Call Votes from the US Senate}
-\author{Jordan Poles}
+\title{A Retrospective Exploration of the US Senate through Data}
+\author{Jordan Poles, Tony Chen and Aparna Narendrula}
 \maketitle
-<<echo=FALSE>>=
+\section*{An Introduction to the Data}
+Our analysis covers a dataset which has been extracted from several different sources covering the timespan from the 101st to 113th US Congress. This corresponds to years of 1989 through 2014. The goal of our analysis was to assess trends in the members and bills passed by the US Senate. Our group found it most sensible to focus our efforts on one of the two chambers of Congress (the other being the House of Representatives). 
+
+We selected the Senate for two reasions:
+\begin{enumerate}
+  \item The Senate provides a more represenative overview of the political sentiments present on the state scale
+  \item The Senate provided the lists of Roll Call votes used in our analysis in a much more accessible format (XML) than the House of Representatives (HTML)
+\end{enumerate}
+
+To begin our analysis, we examined the characteristics of the senators who participated in each congress, using the \href{http://developer.nytimes.com/docs/congress_api}{Congress API} provided by the NY Times. This dataset was made retreived as JSON from a URI based API. These JSON files - as well as all of the other datafiles we fetched - were cleaned by an R script, prior to storage in a SQLite database for analysis. This data was stored in the "members" table, and contains a variety of variables, including identifiers such as name, ID, party, state, and seniority in addition to metrics like percentage of votes with party and vote miss rate. 
+
+The member data we retreived got us interested in examining the voting behaviour of the senators. We proceed with our analysis by examining the bills which were voted on in each session of the senate. We focus our analysis on roll-call bills - those bills where the vote of each senator is individually recorded. 
+In order to examine these bills we first fetched a series of files from \href{http://www.senate.gov/legislative/votes.htm}{senate.gov} containing lists of roll-call votes (and metadata) for each session or year of congress in an XML format. These data were stored in the "senateRollCalls" table, which contains the date of each vote, the issue at hand, and the outcome - overall number of yeas and nays.
+
+While the roll-call vote data from the senate tells us about passage rates for individual bills, it does not reveal individual voting behaviour. Indeed, this data was initially retreived in the interest of compiling a complete list of roll-call votes for lookup on our third and final data-source, \href{govtrack.org}{govtrack.org}. The govtrack group provides a bulk data API which can be used to lookup the vote of each individual senator on a given bill. This data was retreived as JSON, before being stored in our third table "votes". We use this information to examine each senators voting behavior individually, and in comparison to the corresponding parties or congresses.
+\section*{The Importance of Assessing our Government}
+The US government is said to be by the people, of the people, and for the people. The importance of transparency cannot be overstated in order for such a government to remain accountable to the people. It was for this reason that our group was surprised that there was no readily published workflow for citizen analysis of data on important governmental bodies like the senate. In this report we detail a protocol which can be used to fetch and store data regarding senate members, and their voting behaviours; the three-step process we detail for aquiring this data, is not very straightforward. We hope that the publication of workflows such as this will make US Government data more accessible to the public. This workflow may also serve as an entry point into more advanced analysis - such as corpus analysis and machine learning - of Senate proceedings and bills.  
+<<echo=FALSE, message=FALSE, warning=FALSE>>=
 #Setting up libraries and imports
   require(RSQLite)
   require(ggplot2)
@@ -16,7 +40,10 @@
 @
 \newpage
 \section*{Examining The Members of Senate}
-<<out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
+\subsubsection*{Introduction to US Political Parties}
+The subsequent figure is the culmination of an analysis of the power held by each of the political parties in the US Senate. We confirm the prevailing understanding of American politics as a system dominated by two major political parties - a bipartisan system. In recent years, an independent party has emerged. However, since then the party has not grown significantly; they have never held more than 2 seats. There is one minor party featured in this plot, the Iowa Democrats, who are an offshoot of the Democratic party. They have only ever held two seats in the US Senate, but do hold a good deal of power in the state; the party also has a noteworthy involvement in the Iowa Caucuses, which are important for presidential elections (\href{http://iowademocrats.org/}{http://iowademocrats.org/}).
+
+<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
   partyDataByYear = queryDB("
     SELECT party as Party, congressNumber, count(*) as ct
     FROM members
