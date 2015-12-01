@@ -31,7 +31,7 @@ While the roll-call vote data from the senate tells us about passage rates for i
 The US government is said to be by the people, of the people, and for the people. The importance of transparency cannot be overstated in order for such a government to remain accountable to the people. It was for this reason that our group was surprised that there was no readily published workflow for citizen analysis of data on important governmental bodies like the senate. In this report we detail a protocol which can be used to fetch and store data regarding senate members, and their voting behaviours; the three-step process we detail for aquiring this data, is not very straightforward. We hope that the publication of workflows such as this will make US Government data more accessible to the public. This workflow may also serve as an entry point into more advanced analysis - such as corpus analysis and machine learning - of Senate proceedings and bills.  
 <<echo=FALSE, message=FALSE, warning=FALSE>>=
 #Setting up libraries and imports
-  require(RSQLite)
+require(RSQLite)
   require(ggplot2)
   require(grid)
   require(reshape2)
@@ -192,7 +192,7 @@ Given that they are a small cohort, we thought that the independent senators des
     scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
     xlab("\nCongress Number") +
     ylab("Number of Bills\n") +
-    ggtitle(expression(atop("Number of Bills Passed Unanimously Per Congress", atop(italic("Bills with 5 or Fewer Dissenting Votes")))))
+    ggtitle(expression(atop("Number of Bills Resolved Unanimously Per Congress", atop(italic("Bills with 5 or Fewer Dissenting Votes")))))
 @
 \newpage
 <<tidy=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
