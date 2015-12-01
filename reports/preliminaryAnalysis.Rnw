@@ -135,6 +135,7 @@ Given that they are a small cohort, we thought that the independent senators des
     xlim(100, 113)+
     xlab("\nCongress Number")+
     ylab("Proportion of Senators in Party\n")+
+    scale_color_manual(values = c("dark blue", "#FF0000"))+
     ggtitle(expression(
       atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
       atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
