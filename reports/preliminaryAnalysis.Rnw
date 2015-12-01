@@ -57,6 +57,7 @@ The subsequent figure is the culmination of an analysis of the power held by eac
     ylab("Proportion of Senate Seats\n")+
     ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time", 
       atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
+  ggsave("fig1.png", width = 10, height = 6, dpi = 300)
 @
 \subsubsection*{Common Senatorial Surnames}
 We find that there are 12 surnames held by more than one senator; these are shown below. Several of these pairs of senators are related to one another. 
@@ -91,6 +92,7 @@ Over the course of the period examined, many states elected similar numbers of s
     xlab("")+ylab("")+
     scale_x_continuous(breaks=NULL)+
     scale_y_continuous(breaks=NULL)
+  ggsave("fig2.png", width = 10, height = 6, dpi = 300)
 @
 <<out.height="2in", out.width="8in", fig.width=8, fig.height=2, echo=FALSE, eval=FALSE>>==
   stateParty = queryDB(paste("SELECT state as stateAbrev, party, count(*) as ct", "FROM members", "WHERE party IN ('D', 'R', 'I') GROUP BY party, state"))
@@ -126,7 +128,18 @@ Given that they are a small cohort, we thought that the independent senators des
   mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
   mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
   mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
-  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+geom_point()+geom_line()+facet_wrap(~variable)+xlim(100, 113)+xlab("\nCongress Number")+ylab("Proportion of Senators in Party\n")+ggtitle("Senators Who Have Ever Used a Web Platform In Their Political Career\n")
+  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
+    geom_point()+
+    geom_line()+
+    facet_wrap(~variable)+
+    xlim(100, 113)+
+    xlab("\nCongress Number")+
+    ylab("Proportion of Senators in Party\n")+
+    ggtitle(expression(
+      atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
+      atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
+    ))
+  ggsave("fig3.png", width = 10, height = 6, dpi = 300)
 @
 \newpage
 \section{Examining Patterns in Bill Passage}
@@ -169,6 +182,7 @@ Given that they are a small cohort, we thought that the independent senators des
     scale_x_continuous(breaks=101:113) +
     ylab("Percentage of positive and negative results of bills\n") +
     ggtitle(expression(atop("Percentage of Bills Passed Per Year", atop(italic("Pass Rate Decreases Before Peaking in 113th Congress")))))
+  ggsave("fig4.png", width = 10, height = 6, dpi = 300)
 @
 \newpage
 <<tidy=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
@@ -192,7 +206,11 @@ Given that they are a small cohort, we thought that the independent senators des
     scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
     xlab("\nCongress Number") +
     ylab("Number of Bills\n") +
-    ggtitle(expression(atop("Number of Bills Passed Unanimously Per Congress", atop(italic("Bills with 5 or Fewer Dissenting Votes")))))
+    ggtitle(expression(
+      atop("Number of Bills Passed Unanimously Per Congress", 
+      atop(italic("Bills with 5 or Fewer Dissenting Votes")))
+    ))
+  ggsave("fig5.png", width = 10, height = 6, dpi = 300)
 @
 \newpage
 <<tidy=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
@@ -208,13 +226,38 @@ Given that they are a small cohort, we thought that the independent senators des
 @
 \newpage
 <<>>==
-  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
-  votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
+  votedata = queryDB("SELECT id, party, vote, count(*) as ct, congressNumber FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, congressNumber")
+  votedatawide = dcast(votedata, id+congressNumber+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
-  ggplot(votedatawide, aes(x=year, y=diff))+geom_boxplot()+geom_jitter(aes(color=party), alpha=.8)+scale_color_manual(values=c("royal blue", "red"))+xlab("\nYear")+ylab("Difference between Number of Yea/Nay Votes By Senator\n")
+  ggplot(votedatawide, aes(x=as.factor(congressNumber), y=diff))+
+    geom_boxplot()+
+    geom_jitter(aes(color=party), alpha=.8)+
+    scale_color_manual(name="Party", values=c("royal blue", "red"))+
+    xlab("\nCongress Number")+
+    ylab("Difference between Number of Yea/Nay Votes By Senator\n")+
+    ggtitle(expression(
+      atop("Number of Bills Approved By Senators Changes by Congress", 
+      atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
+    ))
+  ggsave("fig6.png", width = 10, height = 6, dpi = 300)
+@
+<<>>==
+  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
+  memberPct$withParty = as.integer(as.character(memberPct$withParty))
+  memberPct$congressNumber = as.factor(memberPct$congressNumber)
+  ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
+    geom_boxplot()+
+    xlab("Congress Number")+
+    ylab("Percentage of Votes With Party")+
+    scale_fill_manual(name="Party", values = c("royal blue", "red"))+
+    ggtitle(expression(
+      atop("Senators Typically Vote Along their Party Lines", 
+      atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
+    ))
+  ggsave("fig7.png", width = 10, height = 6, dpi = 300)
 @
 \newpage
-<<tidy=TRUE>>=
+<<tidy=TRUE, echo=FALSE, eval=FALSE>>=
   query = "SELECT party, yeas, nays, (yeas+nays) as total, (100*(yeas-nays)/(yeas+nays)) as voteDiff, congressNumber, session as sessionNumber FROM senateRollCalls"
   rollCallStats = queryDB(query, "data.sqlite")
   rollCallStats$year = apply(rollCallStats, 1, function(x){
@@ -248,13 +291,6 @@ Given that they are a small cohort, we thought that the independent senators des
   xlab("Year") +
   ylab("Mean difference of each year") +
   geom_bar(stat="identity")
-@
-\newpage
-<<>>==
-  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
-  memberPct$withParty = as.integer(as.character(memberPct$withParty))
-  memberPct$congressNumber = as.factor(memberPct$congressNumber)
-  ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+geom_boxplot()+xlab("Congress Number")+ylab("Percentage of Votes With Party")+scale_fill_manual(values = c("royal blue", "red"))+ggtitle("% of Senator Votes With Party Are Unstable Over Time")
 @
 \newpage
 <<>>==
