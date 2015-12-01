@@ -227,20 +227,20 @@ Given that they are a small cohort, we thought that the independent senators des
 @
 \newpage
 <<>>==
-  votedata = queryDB("SELECT id, party, vote, count(*) as ct, congressNumber FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, congressNumber")
-  votedatawide = dcast(votedata, id+congressNumber+party~vote, value.var="ct")
+  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
+  votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
-  ggplot(votedatawide, aes(x=as.factor(congressNumber), y=diff))+
+  ggplot(votedatawide, aes(x=as.factor(year), y=diff))+
     geom_boxplot()+
     geom_jitter(aes(color=party), alpha=.8)+
     scale_color_manual(name="Party", values=c("royal blue", "red"))+
     xlab("\nCongress Number")+
     ylab("Difference between Number of Yea/Nay Votes By Senator\n")+
     ggtitle(expression(
-      atop("Number of Bills Approved By Senators Changes by Congress", 
+      atop("Number of Bills Approved By Senators Changes by Year", 
       atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
     ))
-  ggsave("fig6.png", width = 10, height = 6, dpi = 300)
+  ggsave("fig6.png", width = 11, height = 6, dpi = 300)
 @
 <<>>==
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
