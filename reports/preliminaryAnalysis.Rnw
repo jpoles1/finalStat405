@@ -207,7 +207,7 @@ Given that they are a small cohort, we thought that the independent senators des
     xlab("\nCongress Number") +
     ylab("Number of Bills\n") +
     ggtitle(expression(
-      atop("Number of Bills Passed Unanimously Per Congress", 
+      atop("Number of Bills Resolved Unanimously Per Congress", 
       atop(italic("Bills with 5 or Fewer Dissenting Votes")))
     ))
   ggsave("fig5.png", width = 10, height = 6, dpi = 300)
