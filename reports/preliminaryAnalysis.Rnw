@@ -40,11 +40,37 @@ The US government is said to be by the people, of the people, and for the people
   source("../voteAnalysis.R")
 @
 \newpage
-\section*{Technology in the Senate}
+\section*{Examining The Members of Senate}
+\subsection*{Technology in the Senate}
 The integration of technology into the modern American political process presents a number of interesting paradigms for exploration. Of course, it was technology (the electronic cateloging and publication of Senate roll-call votes) which has made all of this analysis possible in the first place; allowing for greater government transparency. 
 
 To begin our analysis, we turn to the use of web platforms by Senators. These platforms (including websites, Facebook, and Twitter) have become more common over time. Since the inception of FDR's fireside chats, electronic media has permitted mass communication of political thought; this capacity has been greatly expanded by the interenet. In our plot we display lifetime usage of each platform. We show that usage has grown rapidly for all platforms, though facebook has lagged behind.
-\section*{Examining The Members of Senate}
+<<tidy=TRUE, echo=FALSE, out.height="6in", out.width="8in", fig.width=8, fig.height=6>>=
+  websiteCt = queryDB("SELECT party as Party, congressNumber, count(*) as webct FROM members WHERE URL!='' AND Party!='I' GROUP BY party, congressNumber")
+  twitterCt = queryDB("SELECT party as Party, congressNumber, count(*) as twitterct FROM members WHERE twitter_account!='' AND Party!='I' GROUP BY party, congressNumber")
+  fbCt = queryDB("SELECT party as Party, congressNumber, count(*) as fbct FROM members WHERE facebook_account!='' AND Party!='I' GROUP BY party, congressNumber")
+  totalCt = queryDB("SELECT party as Party, congressNumber, count(*) as totalct FROM members WHERE Party!='I' GROUP BY party, congressNumber")
+  mediaCt = merge(websiteCt, twitterCt, by=c("Party", "congressNumber"))
+  mediaCt = merge(mediaCt, fbCt, by=c("Party", "congressNumber"))
+  mediaCt = merge(mediaCt, totalCt, by=c("Party", "congressNumber"))
+  mediaCt$Website = mediaCt$webct/mediaCt$totalct
+  mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
+  mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
+  mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
+  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
+    geom_point()+
+    geom_line()+
+    facet_wrap(~variable)+
+    xlim(100, 113)+
+    xlab("\nCongress Number\n")+
+    ylab("\nProportion of Senators in Party\n")+
+    scale_color_manual(values = c("dark blue", "#FF0000"))+
+    ggtitle(expression(
+      atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
+      atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
+    ))
+  ggsave("fig1.png", width = 11, height = 6, dpi = 600)
+@
 \subsubsection*{Introduction to US Political Parties}
 The subsequent figure is the culmination of an analysis of the power held by each of the political parties in the US Senate. We confirm the prevailing understanding of American politics as a system dominated by two major political parties - a bipartisan system. In recent years, an independent party has emerged. However, since then the party has not grown significantly; they have never held more than 2 seats. There is one minor party featured in this plot, the Iowa Democrats, who are an offshoot of the Democratic party. They have only ever held two seats in the US Senate, but do hold a good deal of power in the state; the party also has a noteworthy involvement in the Iowa Caucuses, which are important for presidential elections (\href{http://iowademocrats.org/}{http://iowademocrats.org/}).
 
@@ -76,7 +102,7 @@ We find that there are 12 surnames held by more than one senator; these are show
 \subsubsection*{Examining State Party Preferences}
 Over the course of the period examined, many states elected similar numbers of senators from both major parties (purple); these are states in which senatorial elections may be more contentious. Those states shown in red represent a Republican majority; blue a Democratic majority. The steadfast democratic states are primarily found in the Northeast, while several states in the South and Middle of America are dominated by the Republican party.
 
-<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE>>=
+<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, message=FALSE, warning=FALSE>>=
   stateParty = queryDB("
     SELECT state as stateAbrev, party, count(*) as ct
     FROM members
@@ -90,10 +116,11 @@ Over the course of the period examined, many states elected similar numbers of s
   ggplot(statePartyWide)+
     geom_map(data=stateMap, map=stateMap, aes(x=long, y=lat, map_id=region), fill="#ffffff", color="grey10")+
     geom_map(data=statePartyWide, map=stateMap, aes(fill=diff, map_id=state), color="grey10")+
-    scale_fill_gradient(name="Party Difference\n(# Senators)", low="red", high="navy blue", 
-      guide="legend", limits=c(-30, 30), breaks=seq(-30, 30, length.out = 9))+
-    ggtitle(expression(atop("Party Preferences By State as Determined by Senate Seats", 
-      atop(italic("Data From 1989 to 2014"), "Republicans (Red) vs. Democrats (Blue)"))))+
+    scale_fill_gradient2(name="Party Difference\n(# Senators)", low="red", mid="white", high="navy blue")+
+    ggtitle(expression(
+      atop("Party Preferences By State as Determined by Senate Seats", 
+      atop(italic("Republicans (Red) vs. Democrats (Blue)")))
+    ))+
     xlab("")+ylab("")+
     scale_x_continuous(breaks=NULL)+
     scale_y_continuous(breaks=NULL)
@@ -119,33 +146,6 @@ Given that they are a small cohort, we thought that the independent senators des
   indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state")
   colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
   print(xtable(indep))
-@
-\newpage
-<<tidy=TRUE, out.height="6in", out.width="8in", fig.width=8, fig.height=6>>=
-  websiteCt = queryDB("SELECT party as Party, congressNumber, count(*) as webct FROM members WHERE URL!='' AND Party!='I' GROUP BY party, congressNumber")
-  twitterCt = queryDB("SELECT party as Party, congressNumber, count(*) as twitterct FROM members WHERE twitter_account!='' AND Party!='I' GROUP BY party, congressNumber")
-  fbCt = queryDB("SELECT party as Party, congressNumber, count(*) as fbct FROM members WHERE facebook_account!='' AND Party!='I' GROUP BY party, congressNumber")
-  totalCt = queryDB("SELECT party as Party, congressNumber, count(*) as totalct FROM members WHERE Party!='I' GROUP BY party, congressNumber")
-  mediaCt = merge(websiteCt, twitterCt, by=c("Party", "congressNumber"))
-  mediaCt = merge(mediaCt, fbCt, by=c("Party", "congressNumber"))
-  mediaCt = merge(mediaCt, totalCt, by=c("Party", "congressNumber"))
-  mediaCt$Website = mediaCt$webct/mediaCt$totalct
-  mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
-  mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
-  mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
-  ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
-    geom_point()+
-    geom_line()+
-    facet_wrap(~variable)+
-    xlim(100, 113)+
-    xlab("\nCongress Number\n")+
-    ylab("\nProportion of Senators in Party\n")+
-    scale_color_manual(values = c("dark blue", "#FF0000"))+
-    ggtitle(expression(
-      atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
-      atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
-    ))
-  ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
 \section{Examining Patterns in Bill Passage}
