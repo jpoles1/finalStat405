@@ -69,7 +69,7 @@ To begin our analysis, we turn to the use of web platforms by Senators. These pl
       atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
       atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
     ))
-  ggsave("fig1.png", width = 11, height = 6, dpi = 600)
+  #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{Introduction to US Political Parties}
 The subsequent figure is the culmination of an analysis of the power held by each of the political parties in the US Senate. We confirm the prevailing understanding of American politics as a system dominated by two major political parties - a bipartisan system. In recent years, an independent party has emerged. However, since then the party has not grown significantly; they have never held more than 2 seats. There is one minor party featured in this plot, the Iowa Democrats, who are an offshoot of the Democratic party. They have only ever held two seats in the US Senate, but do hold a good deal of power in the state; the party also has a noteworthy involvement in the Iowa Caucuses, which are important for presidential elections (\href{http://iowademocrats.org/}{http://iowademocrats.org/}).
@@ -88,7 +88,7 @@ The subsequent figure is the culmination of an analysis of the power held by eac
     ylab("\nProportion of Senate Seats\n")+
     ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time", 
       atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
-  ggsave("fig2.png", width = 11, height = 6, dpi = 600)
+  #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{Common Senatorial Surnames}
 We find that there are 12 surnames held by more than one senator; these are shown below. Several of these pairs of senators are related to one another. 
@@ -124,7 +124,7 @@ Over the course of the period examined, many states elected similar numbers of s
     xlab("")+ylab("")+
     scale_x_continuous(breaks=NULL)+
     scale_y_continuous(breaks=NULL)
-  ggsave("fig3.png", width = 10, height = 6, dpi = 600)
+  #ggsave("fig3.png", width = 10, height = 6, dpi = 600)
 @
 <<out.height="2in", out.width="8in", fig.width=8, fig.height=2, echo=FALSE, eval=FALSE>>==
   stateParty = queryDB(paste("SELECT state as stateAbrev, party, count(*) as ct", "FROM members", "WHERE party IN ('D', 'R', 'I') GROUP BY party, state"))
@@ -188,7 +188,7 @@ Given that they are a small cohort, we thought that the independent senators des
     scale_x_continuous(breaks=101:113) +
     ylab("\nPercentage of positive and negative results of bills\n") +
     ggtitle(expression(atop("Percentage of Bills Passed Per Year", atop(italic("Pass Rate Decreases Before Peaking in 113th Congress")))))
-  ggsave("fig4.png", width = 11, height = 6, dpi = 600)
+  #ggsave("fig4.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
 <<tidy=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
@@ -216,7 +216,7 @@ Given that they are a small cohort, we thought that the independent senators des
       atop("Number of Bills Resolved Unanimously Per Congress", 
       atop(italic("Bills with 5 or Fewer Dissenting Votes")))
     ))
-  ggsave("fig5.png", width = 11, height = 6, dpi = 600)
+  #ggsave("fig5.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
 <<tidy=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
@@ -245,7 +245,7 @@ Given that they are a small cohort, we thought that the independent senators des
       atop("Number of Bills Approved By Senators Changes by Year", 
       atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
     ))
-  ggsave("fig6.png", width = 11, height = 6, dpi = 600)
+  #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
 @
 <<>>==
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
@@ -260,7 +260,7 @@ Given that they are a small cohort, we thought that the independent senators des
       atop("Senators Typically Vote Along their Party Lines", 
       atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
     ))
-  ggsave("fig7.png", width = 11, height = 6, dpi = 600)
+  #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
 <<tidy=TRUE, echo=FALSE, eval=FALSE>>=
