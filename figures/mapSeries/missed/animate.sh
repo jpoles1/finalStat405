@@ -1,0 +1,1 @@
+convert -delay 80 -loop 0 *.png map.gif

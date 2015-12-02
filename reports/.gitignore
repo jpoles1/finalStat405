@@ -2,3 +2,5 @@
 *.log
 *.synctex*
 figure
+cache
+*.sty
