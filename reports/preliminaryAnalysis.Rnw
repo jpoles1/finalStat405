@@ -151,6 +151,8 @@ Given that they are a small cohort, we thought that the independent senators des
 \newpage
 \section{Examining Patterns in Bill Passage}
 \subsection{What types of roll-call votes are handled By US Senate?}
+There are all kinds of bills introduced to the Senate, but most of them fall into a couple of broad categories. After plotting counts of bills out, we notice that the two majority categories are the one that initiate a motion to the table and the one that is related to certain amendments, each of which has a count of more than 3500; while all other kinds of bills only count to about 1400 in total, so we consider it is appropriate to synthesize them into one distinct category: "Others".
+
 <<tidy=FALSE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>==
   query <- "select * from
             (select type, count(*) as ct 
@@ -168,6 +170,8 @@ Given that they are a small cohort, we thought that the independent senators des
 @
 
 \subsection{Changes of bill types over year}
+After examining the all-time distribution of bill types, we then tried to investigate if there is any trend in the changing of bill types. We expect that bill types distribution should be fairly stable over time, but it turns out that the counts of the two majority categories ("Amendment" and "Motion") are randomly oscillating, indicating the lack of a clear pattern. However, there are still some noteworthy points. First, There are peaks for both "Amendment" and "Motion" in 1995, so the senate was really busy in that year. This phenomenon might be related to the 1995 Republican Revolution. Also, in the most recent year, 2014, the count of bills regarding amendments has dropped significantly, while the count of other bills increased significantly. This could be due to Obamacare taking effect in that year. 
+
 <<tidy=FALSE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>==
   query <- "select type, year, count(*) as cnt
             from senateRollCalls
@@ -181,6 +185,8 @@ Given that they are a small cohort, we thought that the independent senators des
 @
 
 \subsection{How does the percentage of passed bills change over time?}
+Most bills initiated at the Senate are either passed or rejected. Since it’s reasonable to think that the percentage of bills got passed should be fairly stable over time and that roughly half of all bills should be passed while the other hald negated, it’s really surprising to see that statistics suggest otherwise: the percentage of passed "Amendment" bills was constantly, but not significantly, dropping from the congress 107 through 113, and the percentage of passed "Motion"experienced a soar during congress 113. The soar could possibly be explained as the effect of the launch of Obamacare. Moreover, there are generally more bills got passed than bills got rejected, especially for the "Others" category whose passing rate are constantly near 100 percent. The majority of passed bills may be explained by the fact that most bills are routine or do not have a serious impact (ex. changing the name of a national park).
+
 <<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>==
   passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
             from senateRollCalls 
@@ -202,10 +208,12 @@ Given that they are a small cohort, we thought that the independent senators des
     xlab("\nCongress Number\n") +
     scale_x_continuous(breaks=101:113) +
     ylab("\nPercentage of positive and negative results of bills\n") +
-    ggtitle(expression(atop("Percentage of Bills Passed Per Year", atop(italic("Pass Rate Decreases Before Peaking in 113th Congress")))))
+    ggtitle(expression(atop("Percentage of Bills Passed Per Year")))
   #ggsave("fig4.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{Are bills that received unanimous votes typically passed or failed?}
+Our definition of an unanimously resolved bill is a bill that is either passed with less than 5 vetoes or rejected with less than 5 approvals. The graph is surprising in two ways. First, there are significantly more unanimously passed bills than failed bills; second, there are a lot of unanimously resolved bills each year, while we previously assumed that amount should be pretty low. One reason that may expain both strangenesses is that there are many bills whose passage will hurt no one, and they are likely the ones that are neither related to money nor certain political parties.
+
 <<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
   query <- "select pass, fail, p.congressNumber 
             from
