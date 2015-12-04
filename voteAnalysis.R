@@ -4,6 +4,7 @@ queryDB = function(query, dbPath="data.sqlite"){
   res <- dbSendQuery(dbcon, query)
   data <- fetch(res, -1)
   dbClearResult(res)
+  dbDisconnect(dbcon)
   return(data)
 }
 #Converts a given congress and session number to a year using the following table

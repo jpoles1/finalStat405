@@ -153,14 +153,13 @@ Given that they are a small cohort, we thought that the independent senators des
 \subsection{What types of roll-call votes are handled By US Senate?}
 <<tidy=FALSE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>==
   query <- "select * from
-            (select questionType, count(*) as ct 
+            (select type, count(*) as ct 
              from senateRollCalls 
-             where questionType not null
-             group by questionType)
+             group by type)
            where ct > 10"
-  type <- queryDB(query, "data.sqlite")
-  ggplot(type) +
-  aes(x = reorder(questionType, ct), y = ct) +
+  qtype <- queryDB(query, "data.sqlite")
+  ggplot(qtype) +
+  aes(x = reorder(type, ct), y = ct) +
   labs(title="Types of Roll-call Votes\n") +
   xlab("\nBill type\n") +
   ylab("\n# of Roll-call Votes") +
@@ -169,22 +168,23 @@ Given that they are a small cohort, we thought that the independent senators des
 @
 \subsection{How does the percentage of passed bills change over time?}
 <<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>==
-  passedQuery <- "select 'Pass' as res, congressNumber, count(*) as cnt 
+  passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
             from senateRollCalls 
             where result == 'Agreed to'
                   or result == 'Confirmed'
                   or result == 'Passed' 
-            group by congressNumber"
+            group by congressNumber, type"
   passedResults <- queryDB(passedQuery, "data.sqlite")
-  failedQuery <- "select 'Fail' as res, congressNumber, count(*) as cnt 
+  failedQuery <- "select 'Fail' as res, congressNumber, type, count(*) as cnt 
             from senateRollCalls 
             where result == 'Rejected'
-            group by congressNumber"
+            group by congressNumber, type"
   failedResults <- queryDB(failedQuery, "data.sqlite")
   results <- rbind(passedResults, failedResults)
   ggplot(results) + aes(x=congressNumber, y=cnt, fill=res) +
     geom_histogram(position="fill", stat="identity", width=1) +
     scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
+    facet_grid(type ~ .) +
     xlab("\nCongress Number\n") +
     scale_x_continuous(breaks=101:113) +
     ylab("\nPercentage of positive and negative results of bills\n") +
