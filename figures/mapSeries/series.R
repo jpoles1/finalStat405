@@ -32,3 +32,16 @@ for(congressNumber in congressRange){
     scale_fill_gradient(name="% Missed Votes", limits=c(0,upperbound), na.value="dark red")
   ggsave(file=sprintf("../figures/mapSeries/missed/%s.png", congressNumber), width= 10, height=6, dpi=200)
 }
+
+yearRange = 1989:2014
+for (year in yearRange) {
+  query <- sprintf("select type
+            from senateRollCalls
+            where year = %s", year)
+  types <- queryDB(query, 'data.sqlite')
+  pie <- ggplot(types,aes(x = factor(1), fill = type)) + geom_bar(width = 1) +
+    coord_polar(theta = "y") + xlab("") + ylab("") + scale_x_discrete(breaks=NULL) +
+    ggtitle(sprintf("Bill types\nYear: %s\n", year))+
+    scale_y_continuous(breaks=NULL)
+  ggsave(file=sprintf("../figures/mapSeries/billTypes/%s.png", year), width= 10, height=6, dpi=200)
+}

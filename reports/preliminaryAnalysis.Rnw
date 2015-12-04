@@ -166,6 +166,20 @@ Given that they are a small cohort, we thought that the independent senators des
   geom_bar(stat="identity") +
   coord_flip()
 @
+
+\subsection{Changes of bill types over year}
+<<tidy=FALSE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>==
+  query <- "select type, year, count(*) as cnt
+            from senateRollCalls
+            group by type, year"
+  typeOverYear <- queryDB(query, "data.sqlite")
+  ggplot(typeOverYear) +
+  aes(x=year, y=cnt, colour=type) +
+  geom_line() +
+  geom_point() +
+  ggtitle("Changes of bill types over year")
+@
+
 \subsection{How does the percentage of passed bills change over time?}
 <<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>==
   passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
