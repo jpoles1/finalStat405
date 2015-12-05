@@ -1,5 +1,5 @@
 \documentclass[10pt]{article}
-\usepackage[left=1cm,right=1cm,top=1cm,bottom=1cm]{geometry}
+\usepackage[left=1cm,right=1cm,top=1cm,bottom=1cm, foot=.5cm]{geometry}
 \usepackage{amsmath}
 \usepackage{helvet}
 \renewcommand{\familydefault}{\sfdefault}
@@ -153,7 +153,7 @@ Given that they are a small cohort, we thought that the independent senators des
 \subsection{What types of roll-call votes are handled By US Senate?}
 There are all kinds of bills introduced to the Senate, but most of them fall into a couple of broad categories. After plotting counts of bills out, we notice that the two majority categories are the one that initiate a motion to the table and the one that is related to certain amendments, each of which has a count of more than 3500; while all other kinds of bills only count to about 1400 in total, so we consider it is appropriate to synthesize them into one distinct category: "Others".
 
-<<tidy=FALSE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>==
+<<tidy=FALSE, echo=FALSE, eval=FALSE, out.height="4in", out.width="7.5in", fig.width=7.5, fig.height=4>>==
   query <- "select * from
             (select type, count(*) as ct 
              from senateRollCalls 
