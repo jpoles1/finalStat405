@@ -18,7 +18,11 @@ Our analysis covers a dataset which has been extracted from several different so
 
 We selected the Senate for two reasions:
 \begin{enumerate}
-  \item The Senate provides a more represenative overview of the political sentiments present on the state scale
+  \item The Senate provides a more balanced overview of the political sentiments present on the state scale.
+  \begin{enumerate}
+    \item Each state is assigned 2 Senators, while the House of Representatives determines the number of representatives for a state based upon population.
+    \item The Senate is smaller in size, less susceptible to partisan issues, and bueracratic gridlock
+  \end{enumerate}
   \item The Senate provided the lists of Roll Call votes used in our analysis in a much more accessible format (XML) than the House of Representatives (HTML)
 \end{enumerate}
 
@@ -153,6 +157,7 @@ Given that they are a small cohort, we thought that the independent senators des
 @
 \newpage
 \section{Examining Patterns in Bill Passage}
+The United States Senate maintains an archive of roll-call votes - those votes in which the vote of each individual senator is recorded, rather than just having an overall tally - accessible via a series of folders on their servers containing XML files. We parsed these XML files using the code found in Appendix A
 \subsection{What types of roll-call votes are handled By US Senate?}
 There are all kinds of bills introduced to the Senate, but most of them fall into a couple of broad categories. After plotting counts of bills out, we notice that the two majority categories are the one that initiate a motion to the table and the one that is related to certain amendments, each of which has a count of more than 3500; while all other kinds of bills only count to about 1400 in total, so we consider it is appropriate to synthesize them into one distinct category: "Others".
 
@@ -175,22 +180,25 @@ There are all kinds of bills introduced to the Senate, but most of them fall int
 \subsection{Changes of bill types over year}
 After examining the all-time distribution of bill types, we then tried to investigate if there is any trend in the changing of bill types. We expect that bill types distribution should be fairly stable over time, but it turns out that the counts of the two majority categories ("Amendment" and "Motion") are randomly oscillating, indicating the lack of a clear pattern. However, there are still some noteworthy points. First, There are peaks for both "Amendment" and "Motion" in 1995, so the senate was really busy in that year. This phenomenon might be related to the 1995 Republican Revolution. Also, in the most recent year, 2014, the count of bills regarding amendments has dropped significantly, while the count of other bills increased significantly. This could be due to Obamacare taking effect in that year. 
 
-<<tidy=FALSE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>==
-  query <- "select type, year, count(*) as cnt
+<<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5>>==
+  query <- "select type, year, count(*) as ct
             from senateRollCalls
             group by type, year"
   typeOverYear <- queryDB(query, "data.sqlite")
   ggplot(typeOverYear) +
-  aes(x=year, y=cnt, colour=type) +
-  geom_line() +
-  geom_point() +
-  ggtitle("Changes of bill types over year")
+    aes(x=year, y=ct, colour=type) +
+    geom_line() +
+    geom_point() +
+    scale_color_discrete(name="Type of Bill")+
+    ylab("Number of Bills Per Year\n")+
+    xlab("\nYear")+
+    ggtitle("Changes in Types of Bills Before US Senate Over Time\n")
 @
 
 \subsection{How does the percentage of passed bills change over time?}
 Most bills initiated at the Senate are either passed or rejected. Since it’s reasonable to think that the percentage of bills got passed should be fairly stable over time and that roughly half of all bills should be passed while the other hald negated, it’s really surprising to see that statistics suggest otherwise: the percentage of passed "Amendment" bills was constantly, but not significantly, dropping from the congress 107 through 113, and the percentage of passed "Motion"experienced a soar during congress 113. The soar could possibly be explained as the effect of the launch of Obamacare. Moreover, there are generally more bills got passed than bills got rejected, especially for the "Others" category whose passing rate are constantly near 100 percent. The majority of passed bills may be explained by the fact that most bills are routine or do not have a serious impact (ex. changing the name of a national park).
 
-<<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>==
+<<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5, cache=TRUE>>==
   passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
             from senateRollCalls 
             where result == 'Agreed to'
@@ -210,14 +218,14 @@ Most bills initiated at the Senate are either passed or rejected. Since it’s r
     #facet_grid(type ~ .) +
     xlab("\nCongress Number\n") +
     scale_x_continuous(breaks=101:113) +
-    ylab("\nPercentage of positive and negative results of bills\n") +
+    ylab("\nPercentage of Bills\n") +
     ggtitle(expression(atop("Percentage of Bills Passed Per Year")))
   #ggsave("fig4.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{Are bills that received unanimous votes typically passed or failed?}
 Our definition of an unanimously resolved bill is a bill that is either passed with less than 5 vetoes or rejected with less than 5 approvals. The graph is surprising in two ways. First, there are significantly more unanimously passed bills than failed bills; second, there are a lot of unanimously resolved bills each year, while we previously assumed that amount should be pretty low. One reason that may expain both strangenesses is that there are many bills whose passage will hurt no one, and they are likely the ones that are neither related to money nor certain political parties.
 
-<<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
+<<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5>>==
   query <- "select pass, fail, p.congressNumber 
             from
             (select congressNumber, count(*) as Pass 
@@ -244,18 +252,8 @@ Our definition of an unanimously resolved bill is a bill that is either passed w
     ))
   #ggsave("fig5.png", width = 11, height = 6, dpi = 600)
 @
-\newpage
-<<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
-  query = "SELECT id, first_name, last_name, party, seniority, count(*) AS ct FROM members GROUP BY id ORDER BY ct DESC"
-  senatorTotals = queryDB(query, "data.sqlite")
-  ggplot(senatorTotals, aes(x=ct))+xlim(1, 14)+geom_bar(binwidth=.5)+xlab("Number of Terms")+ylab("Count")+ggtitle("Distribution of Terms Served in 101st to 113th Senates")
-@
-\newpage
-<<tidy=TRUE, echo=FALSE, eval=FALSE>>=
-  query = "SELECT party, count(*) as ct FROM votes GROUP BY party"
-  partyVoteTotals = queryDB(query, "data.sqlite")
-  ggplot(partyVoteTotals, aes(x=reorder(party, ct), y=ct))+geom_bar(stat="identity")+ggtitle(sprintf("Total Number of Votes by Party\nTotal Votes: %s", sum(partyVoteTotals$ct)))
-@
+\section{An Analysis of Voting Patterns Using Roll-Call Votes with Individual Senator Resolutions}
+In the previous section, we examined the overall changes in bill passage in the US Senate. For each of the roll-call votes we examinine in our analysis, there is a corresponding list of each Senator's vote: Yea or Nay. We 
 \newpage
 <<echo=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE>>=
   votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
@@ -275,6 +273,7 @@ Our definition of an unanimously resolved bill is a bill that is either passed w
 
   #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
 @
+\newpage
 <<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
   memberPct$withParty = as.integer(as.character(memberPct$withParty))
@@ -289,6 +288,18 @@ Our definition of an unanimously resolved bill is a bill that is either passed w
       atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
     ))
   #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
+@
+\newpage
+<<tidy=FALSE, echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5>>==
+  query = "SELECT id, first_name, last_name, party, seniority, count(*) AS ct FROM members GROUP BY id ORDER BY ct DESC"
+  senatorTotals = queryDB(query, "data.sqlite")
+  ggplot(senatorTotals, aes(x=ct))+xlim(1, 14)+geom_bar(binwidth=.5)+xlab("Number of Terms")+ylab("Count")+ggtitle("Distribution of Terms Served in 101st to 113th Senates")
+@
+\newpage
+<<tidy=TRUE, echo=FALSE, eval=FALSE>>=
+  query = "SELECT party, count(*) as ct FROM votes GROUP BY party"
+  partyVoteTotals = queryDB(query, "data.sqlite")
+  ggplot(partyVoteTotals, aes(x=reorder(party, ct), y=ct))+geom_bar(stat="identity")+ggtitle(sprintf("Total Number of Votes by Party\nTotal Votes: %s", sum(partyVoteTotals$ct)))
 @
 \newpage
 <<tidy=TRUE, echo=FALSE, eval=FALSE>>=
