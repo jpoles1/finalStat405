@@ -46,7 +46,8 @@ The NY Times Congress API provides an interface for accessing a number of charac
 \subsection{How have senators adopted web platforms over time?}
 The integration of technology into the modern American political process presents a number of interesting paradigms for exploration. Of course, it was technology (the electronic cateloging and publication of Senate roll-call votes) which has made all of this analysis possible in the first place; allowing for greater government transparency. 
 
-To begin our analysis, we turn to the use of web platforms by Senators. These platforms (including websites, Facebook, and Twitter) have become more common over time. Since the inception of FDR's fireside chats, electronic media has permitted mass communication of political thought; this capacity has been greatly expanded by the interenet. In our plot we display lifetime usage of each platform. We show that usage has grown rapidly for all platforms, though Facebook has lagged behind.
+To begin our analysis, we turn to the use of web platforms by Senators. These platforms (including websites, Facebook, and Twitter) have become more common over time. Since the inception of FDR's fireside chats, electronic media has permitted mass communication of political thought; this capacity has been greatly expanded by the interenet. In our plot we display lifetime usage of each platform. We show that usage has grown rapidly for all platforms, though Facebook has lagged behind. High web-platform usage is not surprising, given the number of senators that host their websites under senate.gov sub-domains (name.senate.gov). Twitter also seems to be popular, and is often utilized to disseminate political ideology and news.\footnote{For instance: \href{https://twitter.com/McConnellPress}{https://twitter.com/McConnellPress}}
+
 <<tidy=TRUE, echo=FALSE, out.height="6in", out.width="8in", fig.width=8, fig.height=6>>=
   websiteCt = queryDB("SELECT party as Party, congressNumber, count(*) as webct FROM members WHERE URL!='' AND Party!='I' GROUP BY party, congressNumber")
   twitterCt = queryDB("SELECT party as Party, congressNumber, count(*) as twitterct FROM members WHERE twitter_account!='' AND Party!='I' GROUP BY party, congressNumber")
@@ -155,7 +156,7 @@ Given that they are a small cohort, we thought that the independent senators des
 \subsection{What types of roll-call votes are handled By US Senate?}
 There are all kinds of bills introduced to the Senate, but most of them fall into a couple of broad categories. After plotting counts of bills out, we notice that the two majority categories are the one that initiate a motion to the table and the one that is related to certain amendments, each of which has a count of more than 3500; while all other kinds of bills only count to about 1400 in total, so we consider it is appropriate to synthesize them into one distinct category: "Others".
 
-<<tidy=FALSE, echo=FALSE, eval=FALSE, out.height="4in", out.width="7.5in", fig.width=7.5, fig.height=4>>==
+<<tidy=FALSE, echo=FALSE, out.height="2.5in", out.width="7.5in", fig.width=7.5, fig.height=2.5>>==
   query <- "select * from
             (select type, count(*) as ct 
              from senateRollCalls 
@@ -165,7 +166,7 @@ There are all kinds of bills introduced to the Senate, but most of them fall int
   ggplot(qtype) +
   aes(x = reorder(type, ct), y = ct) +
   labs(title="Types of Roll-call Votes\n") +
-  xlab("\nBill type\n") +
+  xlab("Bill type\n") +
   ylab("\n# of Roll-call Votes") +
   geom_bar(stat="identity") +
   coord_flip()
@@ -206,7 +207,7 @@ Most bills initiated at the Senate are either passed or rejected. Since it’s r
   ggplot(results) + aes(x=congressNumber, y=cnt, fill=res) +
     geom_histogram(position="fill", stat="identity", width=1) +
     scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
-    facet_grid(type ~ .) +
+    #facet_grid(type ~ .) +
     xlab("\nCongress Number\n") +
     scale_x_continuous(breaks=101:113) +
     ylab("\nPercentage of positive and negative results of bills\n") +
