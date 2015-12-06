@@ -44,7 +44,6 @@ The US government is said to be by the people, of the people, and for the people
   source("../config.R")
   source("../voteAnalysis.R")
 @
-\newpage
 \section{Examining The Members of Senate}
 The NY Times Congress API provides an interface for accessing a number of characteristics on US Senators including their web presence, party and certain voting patterns. This provides us some introductory insights into the politicians elected by the US citizenry to represent them in the federal government.
 \subsection{How have senators adopted web platforms over time?}
@@ -52,7 +51,7 @@ The integration of technology into the modern American political process present
 
 To begin our analysis, we turn to the use of web platforms by Senators. These platforms (including websites, Facebook, and Twitter) have become more common over time. Since the inception of FDR's fireside chats, electronic media has permitted mass communication of political thought; this capacity has been greatly expanded by the interenet. In our plot we display lifetime usage of each platform. We show that usage has grown rapidly for all platforms, though Facebook has lagged behind. High web-platform usage is not surprising, given the number of senators that host their websites under senate.gov sub-domains (name.senate.gov). Twitter also seems to be popular, and is often utilized to disseminate political ideology and news.\footnote{For instance: \href{https://twitter.com/McConnellPress}{https://twitter.com/McConnellPress}}
 
-<<tidy=TRUE, echo=FALSE, out.height="6in", out.width="8in", fig.width=8, fig.height=6>>=
+<<tidy=TRUE, echo=FALSE, out.height="4in", out.width="8in", fig.width=8, fig.height=4>>=
   websiteCt = queryDB("SELECT party as Party, congressNumber, count(*) as webct FROM members WHERE URL!='' AND Party!='I' GROUP BY party, congressNumber")
   twitterCt = queryDB("SELECT party as Party, congressNumber, count(*) as twitterct FROM members WHERE twitter_account!='' AND Party!='I' GROUP BY party, congressNumber")
   fbCt = queryDB("SELECT party as Party, congressNumber, count(*) as fbct FROM members WHERE facebook_account!='' AND Party!='I' GROUP BY party, congressNumber")
@@ -78,6 +77,25 @@ To begin our analysis, we turn to the use of web platforms by Senators. These pl
     ))
   #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
+\subsection{For how many terms do Senators typically serve?}
+Most senators serve no more than 5 terms. Democrats and Republicans have similar distributions, though Democrats have a peak at greater than 10 terms.
+
+<<out.height="3in", out.width="8in", fig.width=8, fig.height=3, echo=FALSE>>==
+  query = "
+    SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct 
+    FROM members 
+    WHERE party IN ('D', 'R') 
+    GROUP BY fullName
+    ORDER BY ct DESC"
+  senatorTotals = queryDB(query, "data.sqlite")
+  ggplot(senatorTotals)+
+    geom_density(aes(x=ct, color=party, fill=party), alpha=.1)+
+    xlab("Number of Terms")+
+    ylab("Count")+
+    scale_color_manual(name="Party", values = c("dark blue", "#FF0000"))+
+    scale_fill_manual(name="Party", values = c("dark blue", "#FF0000"))+
+    ggtitle("Distribution of Terms Served in 101st to 113th Senates")
+@
 \newpage
 \subsection{What are the dynamics of political parties in the US Senate over time?}
 The subsequent figure is the culmination of an analysis of the power held by each of the political parties in the US Senate. We confirm the prevailing understanding of American politics as a system dominated by two major political parties - a bipartisan system. In recent years, an independent party has emerged. However, since then the party has not grown significantly; they have never held more than 2 seats. There is one minor party featured in this plot, the Iowa Democrats, who are an offshoot of the Democratic party. They have only ever held two seats in the US Senate, but do hold a good deal of power in the state; the party also has a noteworthy involvement in the Iowa Caucuses, which are important for presidential elections\footnote{\href{http://iowademocrats.org/}{http://iowademocrats.org/}}.
@@ -99,7 +117,7 @@ The subsequent figure is the culmination of an analysis of the power held by eac
   #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{How often do multiple senators share a surname?}
-We find that there are 12 surnames held by more than one senator; these are shown below. Several of these pairs of senators are relatives of one another, indicating the possibility of some degree of nepotism in the Senate. For instance, in Rhode Island, the Chafee family has held Senate seats for over three decades. Both Republicans, John Chafee held the seat from 1976-1999,\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}} and his son Lincoln Chafee (who made a run for President in 2016 but has already dropped out) held the seat directly after him from 1999-2007.\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}}. This suggests that some families have a high level of power in US Governance (another instance that comes to mind is the Clinton Family).
+We find that there are 12 surnames held by more than one senator; these are shown below. Several of these pairs of senators are relatives of one another, indicating the possibility of some degree of nepotism in the Senate. For instance, in Rhode Island, the Chafee family has held Senate seats for over three decades. Both Republicans, John Chafee held the seat from 1976-1999,\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}} and his son Lincoln Chafee (who made a run for President in 2016 but has already dropped out) held the seat directly after him from 1999-2007.\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}} This suggests that some families have a high level of power in US Governance (another instance that comes to mind is the Clinton Family).
 <<echo=FALSE, results='asis'>>==
   lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC")
   lastCounts = lastCounts[lastCounts$lastct>1,]
@@ -148,7 +166,7 @@ Over the course of the period examined, many states elected similar numbers of s
     scale_y_continuous(breaks=NULL)
 @
 \subsection{Who are the independent senators? Where are they elected?}
-Given that they are a small cohort, we thought that the independent senators deserved some analytical consideration. We note that the majority of elections won by independent senators are in the state of Vermont (VT), and that there are a small overall number of candidates per number of elections won. Senator Barkley had a small number of votes; further research revealed that he temporarily held the chair of another senator who had died in a plane crash (Paul Wellstone)\footnote{\href{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}}.
+Given that they are a small cohort, we thought that the independent senators deserved some analytical consideration. We note that the majority of elections won by independent senators are in the state of Vermont (VT), and that there are a small overall number of candidates per number of elections won. Senator Barkley had a small number of votes; further research revealed that he temporarily held the chair of another senator who had died in a plane crash (Paul Wellstone).\footnote{\href{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}}
 
 <<echo=FALSE, results='asis'>>==
   indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state")
@@ -253,9 +271,11 @@ Our definition of an unanimously resolved bill is a bill that is either passed w
   #ggsave("fig5.png", width = 11, height = 6, dpi = 600)
 @
 \section{An Analysis of Voting Patterns Using Roll-Call Votes with Individual Senator Resolutions}
-In the previous section, we examined the overall changes in bill passage in the US Senate. For each of the roll-call votes we examinine in our analysis, there is a corresponding list of each Senator's vote: Yea or Nay. We 
-\newpage
-<<echo=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE>>=
+In the previous section, we examined the overall changes in bill passage in the US Senate. For each of the roll-call votes we examinine in our analysis, there is a corresponding list of each Senator's vote: Yea or Nay. More content needed here...
+\subsection{Do Senators Vote Yea/Nay more in a given year?}
+Content needed here.
+
+<<echo=FALSE, warning=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE>>=
   votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
@@ -274,7 +294,10 @@ In the previous section, we examined the overall changes in bill passage in the 
   #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
-<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
+\subsection{Do Senators Typically Vote Along Their Party Lines?}
+Content needed here.
+
+<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, warning=FALSE>>=
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
   memberPct$withParty = as.integer(as.character(memberPct$withParty))
   memberPct$congressNumber = as.factor(memberPct$congressNumber)
@@ -282,6 +305,7 @@ In the previous section, we examined the overall changes in bill passage in the 
     geom_boxplot()+
     xlab("\nCongress Number\n")+
     ylab("\nPercentage of Votes With Party\n")+
+    ylim(50, 100)+
     scale_fill_manual(name="Party", values = c("royal blue", "red"))+
     ggtitle(expression(
       atop("Senators Typically Vote Along their Party Lines", 
