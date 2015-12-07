@@ -299,7 +299,7 @@ Data on individual votes is consistent with roll-call vote data in that the majo
 @
 \newpage
 \subsection{Do Senators Typically Vote Along Their Party Lines?}
-Content needed here.
+For all of the Congresses examined, the majority of both Democratic and Republican Senators voted over 80 percent of the time with their party. There is a small and steady increase between Congresses 101 and 109 in Senators voting with their party. In Congress 110, a discrepancy emerged: most Democrats began to vote 90 percent of the time or more with their party, while most Republicans fell to voting under 90 percent of the time with their party. This trend may correlate with the Obama presidency, which began in 2008 (Congress 110 began in 2007). 
 
 <<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, warning=FALSE>>=
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
