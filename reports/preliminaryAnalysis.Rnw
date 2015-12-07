@@ -385,7 +385,8 @@ mediaCt = merge(mediaCt, totalCt, by=c("Party", "congressNumber"))
 mediaCt$Website = mediaCt$webct/mediaCt$totalct
 mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
 mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
-mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
+mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), 
+  id.vars = c("Party", "congressNumber"))
 ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
   geom_point()+
   geom_line()+
@@ -436,7 +437,11 @@ ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+
 @
 How Often do Multiple Senators Share a Surname?
 <<eval=FALSE>>==
-lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC", "data.sqlite")
+lastCounts=queryDB("
+  SELECT tab.last_name as last, count(*) as lastct 
+  FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct 
+  FROM members GROUP BY full_name ORDER BY ct) AS tab 
+  GROUP BY last ORDER BY lastct DESC", "data.sqlite")
 lastCounts = lastCounts[lastCounts$lastct>1,]
 colnames(lastCounts) = c("Last Name", "# of Senators")
 print(xtable(t(lastCounts)), include.colnames=FALSE)
@@ -468,8 +473,99 @@ ggplot(statePartyWide)+
 @
 Who are the Independent Senators? Where are They Elected?
 <<eval=FALSE>>==
-  indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state", "data.sqlite")
-  colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
-  print(xtable(indep), include.rownames = FALSE)
+indep = queryDB("
+  SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes 
+  FROM members 
+  WHERE party='I' 
+  ORDER BY state", "data.sqlite")
+colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
+print(xtable(indep), include.rownames = FALSE)
 @
+\subsubsection*{Section 4 Figures:}
+What Types of Roll-Call Votes are Handled by the US Senate?
+<<eval=FALSE>>==
+query <- "select * from
+          (select type, count(*) as ct 
+           from senateRollCalls 
+           group by type)
+         where ct > 10"
+qtype <- queryDB(query, "data.sqlite")
+ggplot(qtype) +
+aes(x = reorder(type, ct), y = ct) +
+labs(title="Types of Roll-call Votes\n") +
+xlab("Bill type\n") +
+ylab("\n# of Roll-call Votes") +
+geom_bar(stat="identity") +
+coord_flip()
+@
+How Have Trends in Bill Type Changed over Time?
+<<eval=FALSE>>==
+query <- "select type, year, count(*) as ct
+          from senateRollCalls
+          group by type, year"
+typeOverYear <- queryDB(query, "data.sqlite")
+ggplot(typeOverYear) +
+  aes(x=year, y=ct, colour=type) +
+  geom_line() +
+  geom_point() +
+  scale_color_discrete(name="Type of Bill")+
+  ylab("Number of Bills\n")+
+  xlab("\nYear")+
+  ggtitle("Changes in Types of Bills Before US Senate Over Time\n")
+@
+How Does the Percentage of Passed Bills Change Over Time?
+<<eval=FALSE>>==
+passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
+          from senateRollCalls 
+          where result == 'Agreed to'
+                or result == 'Confirmed'
+                or result == 'Passed' 
+          group by congressNumber, type"
+passedResults <- queryDB(passedQuery, "data.sqlite")
+failedQuery <- "select 'Fail' as res, congressNumber, type, count(*) as cnt 
+          from senateRollCalls 
+          where result == 'Rejected'
+          group by congressNumber, type"
+failedResults <- queryDB(failedQuery, "data.sqlite")
+results <- rbind(passedResults, failedResults)
+ggplot(results) + aes(x=congressNumber, y=cnt, fill=res) +
+  geom_histogram(position="fill", stat="identity", width=1) +
+  scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
+  #facet_grid(type ~ .) +
+  xlab("\nCongress Number\n") +
+  scale_x_continuous(breaks=101:113) +
+  ylab("\nPercentage of Bills\n") +
+  ggtitle(expression(atop("Percentage of Bills Passed Per Year")))
+#ggsave("fig4.png", width = 11, height = 6, dpi = 600)
+@
+Are Bills that Received Unanimous Votes Typically Passed or Failed?
+<<eval=FALSE>>==
+query <- "select pass, fail, p.congressNumber 
+          from
+          (select congressNumber, count(*) as Pass 
+           from senateRollCalls 
+           where  CAST(nays as INTEGER) <= 5 
+           group by congressNumber) as p
+          join
+          (select congressNumber, count(*) as Fail 
+           from senateRollCalls 
+           where  CAST(yeas as INTEGER) <= 5 
+           group by congressNumber) as f
+          on p.congressNumber == f.congressNumber"
+unanimous <- queryDB(query, "data.sqlite")
+unanimous$congressNumber <- factor(unanimous$congressNumber)
+unanimous <- melt(unanimous[,c('congressNumber','Pass','Fail')],id.vars = 1)
+ggplot(unanimous,aes(x = congressNumber,y = value)) + 
+  geom_bar(stat='identity',aes(fill = variable),position = "dodge")+
+  scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
+  xlab("\nCongress Number\n") +
+  ylab("\nNumber of Bills\n") +
+  ggtitle(expression(
+    atop("Number of Bills Resolved Unanimously Per Congress", 
+    atop(italic("Bills with 5 or Fewer Dissenting Votes")))
+  ))
+#ggsave("fig5.png", width = 11, height = 6, dpi = 600)
+@
+\subsubsection*{Section 5 Figures:}
+
 \end{document}
