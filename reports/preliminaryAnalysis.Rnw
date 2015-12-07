@@ -40,7 +40,6 @@ The United States government is said to be by the people, of the people, and for
   require(xtable)
   source("../config.R")
   source("../voteAnalysis.R")
-  getwd()
 @
 \section{Examining The Members of Senate}
 The NY Times Congress API provides an interface for accessing a number of characteristics on US Senators including their web presence, party and voting patterns. This provides us some introductory insights into the behavior of politicians elected by the US citizenry to represent them in the federal government.
@@ -285,7 +284,7 @@ Data on individual votes is consistent with roll-call vote data in that the majo
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
   ggplot(votedatawide, aes(x=as.factor(year), y=diff))+
-    geom_boxplot()+
+    geom_boxplot(outlier.colour = NULL)+
     geom_jitter(aes(color=party), alpha=.8)+
     scale_color_manual(name="Party", values=c("royal blue", "red"))+
     xlab("\nYear\n")+
@@ -318,9 +317,9 @@ For all of the Congresses examined, the majority of both Democratic and Republic
     ))
   #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
 @
-\newpage
 \section{Concluding Thoughts}
 Content needed here.
+\newpage
 \section{Appendix}
 \subsection{Appendix A: Data fetching and Pre-processing}
 Three supplementary R files are included with this analysis. These contain the R code used to fetch and clean the data (divided by filetype) from our three sources:
