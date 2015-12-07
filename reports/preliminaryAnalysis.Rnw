@@ -152,19 +152,6 @@ Over the course of the period examined, many states elected similar numbers of S
     scale_y_continuous(breaks=NULL)
   #ggsave("fig3.png", width = 10, height = 6, dpi = 600)
 @
-<<out.height="2in", out.width="8in", fig.width=8, fig.height=2, echo=FALSE, eval=FALSE>>==
-  stateParty = queryDB(paste("SELECT state as stateAbrev, party, count(*) as ct", "FROM members", "WHERE party IN ('D', 'R', 'I') GROUP BY party, state"), "data.sqlite")
-  stateParty$state = apply(stateParty, 1, FUN=function(x){stateAbrevToFull(x["stateAbrev"])})
-  stateMap = map_data("state")
-  ggplot()+
-    geom_map(data=stateMap, map=stateMap, aes(x=long, y=lat, map_id=region), fill="grey5", color="grey20")+
-    geom_map(data=stateParty, map=stateMap, aes(fill=ct, map_id=state))+
-    facet_wrap(~party)+
-    scale_fill_gradient(name="# Senators", low="yellow", high="red")+
-    xlab("")+ylab("")+
-    scale_x_continuous(breaks=NULL)+
-    scale_y_continuous(breaks=NULL)
-@
 \subsection{Who are the Independent Senators? Where are They Elected?}
 Given that independent Senators are a small cohort, we decided that the independent senators deserved some analytical consideration. We note that the majority of elections won by independent Senators are in the state of Vermont (VT) and that there are a small overall number of candidates per number of elections won. Senator Barkley (I) had a small number of votes. Further research revealed that he temporarily held the chair of Senator Paul Wellstone, who died in a plane crash.\footnote{\href{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}}
 \newline
@@ -356,5 +343,133 @@ Three supplementary R files are included with this analysis. These contain the R
 \href{https://github.com/jpoles1/finalStat405/blob/master/fetchData.R}{fetchData.R} - This Script fetches all of the datasets and stores them in a SQLite database file (data.sqlite) using functions from the previous two files.
 \newpage
 \subsection{Appendix B: Code for Generating Figures}
-
+\subsubsection*{Loading Requirements:}
+<<eval=FALSE>>=
+#Setting up libraries and imports
+require(RSQLite)
+require(ggplot2)
+require(grid)
+require(reshape2)
+require(xtable)
+source("../config.R")
+source("../voteAnalysis.R")
+@
+\subsubsection*{Section 3 Figures:}
+How Have Senators Adopted Web Platforms Over Time?
+<<eval=FALSE>>=
+websiteCt = queryDB("
+  SELECT party as Party, congressNumber, count(*) as webct 
+  FROM members 
+  WHERE URL!='' AND Party!='I' 
+  GROUP BY party, congressNumber
+")
+twitterCt = queryDB("
+  SELECT party as Party, congressNumber, count(*) as twitterct 
+  FROM members 
+  WHERE twitter_account!='' 
+  AND Party!='I' 
+  GROUP BY party, congressNumber")
+fbCt = queryDB("
+  SELECT party as Party, congressNumber, count(*) as fbct
+  FROM members 
+  WHERE facebook_account!='' AND Party!='I' 
+  GROUP BY party, congressNumber")
+totalCt = queryDB("
+  SELECT party as Party, congressNumber, count(*) as totalct 
+  FROM members 
+  WHERE Party!='I' 
+  GROUP BY party, congressNumber")
+mediaCt = merge(websiteCt, twitterCt, by=c("Party", "congressNumber"))
+mediaCt = merge(mediaCt, fbCt, by=c("Party", "congressNumber"))
+mediaCt = merge(mediaCt, totalCt, by=c("Party", "congressNumber"))
+mediaCt$Website = mediaCt$webct/mediaCt$totalct
+mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
+mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
+mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), id.vars = c("Party", "congressNumber"))
+ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
+  geom_point()+
+  geom_line()+
+  facet_wrap(~variable)+
+  xlim(100, 113)+
+  xlab("\nCongress Number\n")+
+  ylab("\nProportion of Senators in Party\n")+
+  scale_color_manual(values = c("dark blue", "#FF0000"))+
+  ggtitle(expression(
+    atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
+    atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
+  ))
+#ggsave("fig1.png", width = 11, height = 6, dpi = 600)
+@
+How many Terms do Senators Typically Serve?
+<<eval=FALSE>>==
+query = "
+  SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct 
+  FROM members 
+  WHERE party IN ('D', 'R') 
+  GROUP BY fullName
+  ORDER BY ct DESC"
+senatorTotals = queryDB(query, "data.sqlite")
+ggplot(senatorTotals)+
+  geom_density(aes(x=ct, color=party, fill=party), alpha=.1)+
+  xlab("Number of Terms")+
+  ylab("Proportion of Senators")+
+  scale_color_manual(name="Party", values = c("dark blue", "#FF0000"))+
+  scale_fill_manual(name="Party", values = c("dark blue", "#FF0000"))+
+  ggtitle("Distribution of Terms Served in 101st to 113th Senates")
+@
+What are the Dynamics of Political Parties in the US Senate Over Time?
+<<eval=FALSE>>=
+partyDataByYear = queryDB("
+  SELECT party as Party, congressNumber, count(*) as ct
+  FROM members
+  GROUP BY party, congressNumber
+", "data.sqlite")
+ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+
+  scale_fill_manual(name = "Party", values = c("#4169E1", "green", "dark blue", "#FF0000"))+
+  geom_histogram(position="fill", stat="identity", width=1)+
+  xlab("\nCongress Number\n")+
+  scale_x_continuous(breaks=101:113)+
+  ylab("\nProportion of Senate Seats\n")+
+  ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time", 
+    atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
+#ggsave("fig2.png", width = 11, height = 6, dpi = 600)
+@
+How Often do Multiple Senators Share a Surname?
+<<eval=FALSE>>==
+lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC", "data.sqlite")
+lastCounts = lastCounts[lastCounts$lastct>1,]
+colnames(lastCounts) = c("Last Name", "# of Senators")
+print(xtable(t(lastCounts)), include.colnames=FALSE)
+@
+Do Certain States Prefer Certain Political Parties?
+<<eval=FALSE>>=
+stateParty = queryDB("
+  SELECT state as stateAbrev, party, count(*) as ct
+  FROM members
+  WHERE party IN ('D', 'R') GROUP BY party, state
+", "data.sqlite")
+statePartyWide = dcast(stateParty, stateAbrev~party, value.var="ct")
+statePartyWide[is.na(statePartyWide)]=0
+statePartyWide$diff = statePartyWide$D-statePartyWide$R
+statePartyWide$state = apply(statePartyWide, 1, FUN=function(x){stateAbrevToFull(x["stateAbrev"])})
+stateMap = map_data("state")
+ggplot(statePartyWide)+
+  geom_map(data=stateMap, map=stateMap, aes(x=long, y=lat, map_id=region), fill="#ffffff", color="grey10")+
+  geom_map(data=statePartyWide, map=stateMap, aes(fill=diff, map_id=state), color="grey10")+
+  scale_fill_gradient2(name="Party Difference\n(# Senators)", low="red", mid="white", high="navy blue")+
+  ggtitle(expression(
+    atop("Party Preferences By State as Determined by Senate Seats", 
+    atop(italic("Republicans (Red) vs. Democrats (Blue)")))
+  ))+
+  xlab("")+ylab("")+
+  scale_x_continuous(breaks=NULL)+
+  scale_y_continuous(breaks=NULL)
+#ggsave("fig3.png", width = 10, height = 6, dpi = 600)
+@
+Who are the Independent Senators? Where are They Elected?
+<<eval=FALSE>>==
+  indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state", "data.sqlite")
+  colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
+  print(xtable(indep), include.rownames = FALSE)
+@
 \end{document}
