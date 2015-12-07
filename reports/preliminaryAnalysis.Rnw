@@ -582,7 +582,10 @@ ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
 @
 Do Senators Vote Yea/Nay more in a Given Year?
 <<eval=FALSE>>=
-  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
+  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year 
+                     FROM votes 
+                     WHERE party in ('D', 'R') 
+                     GROUP BY id, vote, year")
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
   ggplot(votedatawide, aes(x=as.factor(year), y=diff))+
@@ -598,4 +601,7 @@ Do Senators Vote Yea/Nay more in a Given Year?
 
   #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
 @
+\newpage
+\subsection{Appendix C: Code for Generating Animated .gifs for Time Series Vizualization}
+
 \end{document}
