@@ -29,7 +29,7 @@ The member data motivated us to examine the voting behavior of senators as well 
 
 The roll-call vote data from the Senate offers information about passage rates for individual bills but it does not reveal individual voting behaviour. This data was retrieved using our third and final data-source, \href{govtrack.org}{govtrack.org}, in the interest of compiling a complete list of roll-call votes for lookup. The govtrack group provides a bulk data API which can be used to lookup the vote of each individual senator on a given bill. This data was retrieved as JSON before being stored in our third table ”votes”. We used this information to examine each Senator’s voting behavior individually in relation to corresponding parties or congresses.
 
-\section{The Importance of Assessing our Government}
+\subsection{The Importance of Assessing our Government}
 The United States government is said to be by the people, of the people, and for the people. The importance of transparency cannot be overstated in order for such a government to remain accountable to the people. Therefore we were surprised that there was no readily published workflow for citizen analysis of data on important governmental bodies like the Senate. In this report we detail a protocol which can be used to fetch and store data regarding Senate members and their voting behaviours. The three-step process we detail for acquiring this data, is not straightforward, so we hope that the publication of workflows such as this will make US governmental data more accessible to the public. This workflow may also serve as an entry point into more advanced analysis, such as corpus analysis and machine learning, of Senate proceedings and bills.
 <<echo=FALSE, message=FALSE, warning=FALSE>>=
 #Setting up libraries and imports
@@ -582,7 +582,10 @@ ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
 @
 Do Senators Vote Yea/Nay more in a Given Year?
 <<eval=FALSE>>=
-  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
+  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year 
+                     FROM votes 
+                     WHERE party in ('D', 'R') 
+                     GROUP BY id, vote, year")
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
   ggplot(votedatawide, aes(x=as.factor(year), y=diff))+
@@ -598,4 +601,7 @@ Do Senators Vote Yea/Nay more in a Given Year?
 
   #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
 @
+\newpage
+\subsection{Appendix C: Code for Generating Animated .gifs for Time Series Vizualization}
+
 \end{document}
