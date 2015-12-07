@@ -4,3 +4,5 @@
 figure
 cache
 *.sty
+*.aux
+*.out
