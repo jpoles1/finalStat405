@@ -332,7 +332,7 @@ Content needed here? Figure may need reworking.
   yeaDiffSd = setNames(aggregate(diff ~ year, yeaDiff, sd), c("year", "std"))
   yeaDiffDistribution = merge(yeaDiffMean, yeaDiffSd, by="year")
   ggplot(yeaDiffDistribution) +
-  aes(x = year, y = mean, group = 1) +
+  aes(x = year, y = mean, group = 1, colour = 'Red') +
   scale_x_discrete(breaks=c(1989,1994,1999,2004,2009,2014)) +
   labs(title="Mean of difference of 'yea' votes of two majority parties 
        \ndivided by total 'yea' votes from 1989 to 2014") +
