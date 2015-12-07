@@ -119,7 +119,7 @@ There are 12 surnames held by more than one Senator over time in the Congresses 
   lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC")
   lastCounts = lastCounts[lastCounts$lastct>1,]
   colnames(lastCounts) = c("Last Name", "# of Senators")
-  print(xtable(t(lastCounts)))
+  print(xtable(t(lastCounts)), include.colnames=FALSE)
 @
 \newpage
 \subsection{Do certain states prefer certain political parties?}
@@ -378,12 +378,7 @@ Content needed here.
 Three supplementary R files are included with this analysis. These contain the R code used to fetch and clean the data (divided by filetype) from our three sources:
 
 \href{}{fetchJSON.R} - This script contains the functions required to download data from the New York Times Congress and govtrack.org role-call vote APIs:
-  \begin{enumerate}
-    
-  \end{enumerate}
-fetchXML.R 
-  \begin{enumerate}
-  \end{enumerate}
+
 fetchData.R - This Script fetches all of the datasets and stores them in a SQLite database file (data.sqlite). The fetching and handling JSON files from 
 
 
