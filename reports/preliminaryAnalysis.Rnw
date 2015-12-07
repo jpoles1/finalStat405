@@ -69,15 +69,14 @@ To begin our analysis, we turned to the use of web platforms by Senators. These 
     ylab("\nProportion of Senators in Party\n")+
     scale_color_manual(values = c("dark blue", "#FF0000"))+
     ggtitle(expression(
-      atop("Senators Who Have Ever Used a Web Platform In Their Political Career",
-      atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
+      atop("Senators Who Have Ever Used a Web Platform In Their Political Career")
     ))
   #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{How many Terms do Senators Typically Serve?}
 Many Senators serve no more than 5 terms. Democrats and Republicans have similar distributions, although more Republicans serve 5-10 terms, while more Democrats serve greater than 10 terms.
 
-<<out.height="3in", out.width="8in", fig.width=8, fig.height=3, echo=FALSE>>==
+<<out.height="3.2in", out.width="8in", fig.width=8, fig.height=3.2, echo=FALSE>>==
   query = "
     SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct
     FROM members
@@ -88,10 +87,10 @@ Many Senators serve no more than 5 terms. Democrats and Republicans have similar
   ggplot(senatorTotals)+
     geom_density(aes(x=ct, color=party, fill=party), alpha=.1)+
     xlab("Number of Terms")+
-    ylab("Proportion of Senators")+
+    ylab("Proportion of Senators\n")+
     scale_color_manual(name="Party", values = c("dark blue", "#FF0000"))+
     scale_fill_manual(name="Party", values = c("dark blue", "#FF0000"))+
-    ggtitle("Distribution of Terms Served in 101st to 113th Senates")
+    ggtitle("Distribution of Terms Served in 101st to 113th Senates\n")
 @
 \newpage
 \subsection{What are the Dynamics of Political Parties in the US Senate Over Time?}
@@ -109,8 +108,7 @@ This figure is the culmination of an analysis of the power held by each of the p
     xlab("\nCongress Number\n")+
     scale_x_continuous(breaks=101:113)+
     ylab("\nProportion of Senate Seats\n")+
-    ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time",
-      atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
+    ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time")))
   #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{How Often do Multiple Senators Share a Surname?}
@@ -266,7 +264,7 @@ In the previous section, we examined the overall trends in bill passage in the U
 \subsection{Do Senators Typically Vote Along Their Party Lines?}
 For all of the Congresses examined, the majority of both Democratic and Republican Senators voted over 80 percent of the time with their party. There is a small and steady increase between Congresses 101 and 109 in Senators voting with their party. In Congress 110, a discrepancy emerged: most Democrats began to vote 90 percent of the time or more with their party, while most Republicans fell to voting under 90 percent of the time with their party. This trend may correlate with the Obama presidency, which began in 2008 (Congress 110 began in 2007).
 
-<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE, warning=FALSE>>=
+<<echo=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE, warning=FALSE>>=
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')", "data.sqlite")
   memberPct$withParty = as.integer(as.character(memberPct$withParty))
   memberPct$congressNumber = as.factor(memberPct$congressNumber)
@@ -276,8 +274,7 @@ For all of the Congresses examined, the majority of both Democratic and Republic
     ylab("\nPercentage of Votes With Party\n")+
     scale_fill_manual(name="Party", values = c("royal blue", "red"))+
     ggtitle(expression(
-      atop("Senators Typically Vote Along their Party Lines",
-      atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
+      atop("Senators Typically Vote Along their Party Lines")
     ))
   #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
 @
@@ -285,7 +282,7 @@ For all of the Congresses examined, the majority of both Democratic and Republic
 \subsection{Do Senators Vote Yea/Nay more in a Given Year?}
 Data on individual votes is consistent with roll-call vote data in that the majority of Senators in nearly if not all years from 1989-2014 vote yea more often than nay (4.3). However, investigation of the number of yae/nay votes of individual Senators is correlated with political party, as shown through the clustering of red dots in the figure below, each symbolizing one Republican Senator and the clustering of blue dots, each symbolizing one Democratic Senator, for each year. Certain years have more variance, which follows from a greater divide between party voting for a particular year. Years with a particularly great divide between the difference in yae and nae votes per Senator are 1993, 1995, 2005, and 2014. These difference may be due to political events, such as the Republican Revolution in 1995, during which the GOP experienced great success in the US Midterm Elections (the plot shows a significantly greater number of yaes-nays for Republicans than for Democrats. For the majority of years from 1989-2015, the difference yae - nay for Democrats is greater than for Republicans, except between 1995 and 1999.
 
-<<echo=FALSE, warning=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
+<<echo=FALSE, warning=FALSE, out.height="7.5in", out.width="8in", fig.width=8, fig.height=7.5, cache=TRUE>>=
   votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
@@ -296,8 +293,7 @@ Data on individual votes is consistent with roll-call vote data in that the majo
     xlab("\nYear\n")+
     ylab("\nDifference between Number of Yea/Nay Votes By Senator\n")+
     ggtitle(expression(
-      atop("Number of Bills Approved By Senators Changes by Year",
-      atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
+      atop("Number of Bills Approved By Senators Changes by Year")
     ))+
     coord_flip()
 
@@ -397,8 +393,7 @@ ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
   ylab("\nProportion of Senators in Party\n")+
   scale_color_manual(values = c("dark blue", "#FF0000"))+
   ggtitle(expression(
-    atop("Senators Who Have Ever Used a Web Platform In Their Political Career",
-    atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
+    atop("Senators Who Have Ever Used a Web Platform In Their Political Career")
   ))
 #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
@@ -432,8 +427,7 @@ ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+
   xlab("\nCongress Number\n")+
   scale_x_continuous(breaks=101:113)+
   ylab("\nProportion of Senate Seats\n")+
-  ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time",
-    atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
+  ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time")))
 #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
 How Often do Multiple Senators Share a Surname?
@@ -583,8 +577,7 @@ ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
   ylab("\nPercentage of Votes With Party\n")+
   scale_fill_manual(name="Party", values = c("royal blue", "red"))+
   ggtitle(expression(
-    atop("Senators Typically Vote Along their Party Lines",
-    atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
+    atop("Senators Typically Vote Along their Party Lines")
   ))
 #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
 @
@@ -600,8 +593,7 @@ Do Senators Vote Yea/Nay more in a Given Year?
     xlab("\nYear\n")+
     ylab("\nDifference between Number of Yea/Nay Votes By Senator\n")+
     ggtitle(expression(
-      atop("Number of Bills Approved By Senators Changes by Year",
-      atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
+      atop("Number of Bills Approved By Senators Changes by Year")
     ))+
     coord_flip()
 
