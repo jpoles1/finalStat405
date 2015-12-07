@@ -23,9 +23,9 @@ This report details our analysis of a dataset covering the 101st to the 113th US
   \end{enumerate}
   \item The Senate provided the lists of roll call votes used in our analysis in a much more accessible format (XML) than the House of Representatives (HTML).
 \end{enumerate}
-To begin our analysis, we examined the characteristics of the senators who participated in each of Congresses 101 - 113 using the NY Times \href{http://developer.nytimes.com/docs/congress_api}{Congress API}. We refer to this data as “member data” for the remainder of this report. The member dataset was made retrieved as JSON via several calls to a URI based API. These JSON files - as well as all of the other datafiles we fetched - were cleaned by an R script (Appendix A) prior to storage in a SQLite database for analysis. This data was stored in the ”members” table, and contains a variety of variables including identifiers such as name, ID, party, state, and seniority in addition to metrics such as percentage of votes with party and vote miss rate. 
+To begin our analysis, we examined the characteristics of the senators who participated in each of Congresses 101 - 113 using the NY Times \href{http://developer.nytimes.com/docs/congress_api}{Congress API}. We refer to this data as “member data” for the remainder of this report. The member dataset was made retrieved as JSON via several calls to a URI based API. These JSON files - as well as all of the other datafiles we fetched - were cleaned by an R script (Appendix A) prior to storage in a SQLite database for analysis. This data was stored in the ”members” table, and contains a variety of variables including identifiers such as name, ID, party, state, and seniority in addition to metrics such as percentage of votes with party and vote miss rate.
 
-The member data motivated us to examine the voting behavior of senators. We proceeded to examine the bills which were voted on in each session of the Senate. Our analysis focuses on roll-call bills - those bills for which the vote of each senator is individually recorded. In order to examine these bills we first fetched a series of files from \href{http://www.senate.gov/legislative/votes.htm}{senate.gov} containing lists of roll-call votes (and metadata) for each session (or year) of congress in an XML format. These data were stored in the ”senateRollCalls” table, which contains the date of each vote, the issue at hand, and the outcome (overall number of yeas and nays). We refer to this as “roll-call vote data”.  
+The member data motivated us to examine the voting behavior of senators. We proceeded to examine the bills which were voted on in each session of the Senate. Our analysis focuses on roll-call bills - those bills for which the vote of each senator is individually recorded. In order to examine these bills we first fetched a series of files from \href{http://www.senate.gov/legislative/votes.htm}{senate.gov} containing lists of roll-call votes (and metadata) for each session (or year) of congress in an XML format. These data were stored in the ”senateRollCalls” table, which contains the date of each vote, the issue at hand, and the outcome (overall number of yeas and nays). We refer to this as “roll-call vote data”.
 
 The roll-call vote data from the Senate offers information about passage rates for individual bills but it does not reveal individual voting behaviour. This data was retrieved using our third and final data-source, \href{govtrack.org}{govtrack.org}, in the interest of compiling a complete list of roll-call votes for lookup. The govtrack group provides a bulk data API which can be used to lookup the vote of each individual senator on a given bill. This data was retrieved as JSON before being stored in our third table ”votes”. We used this information to examine each Senator’s voting behavior individually in relation to corresponding parties or congresses.
 
@@ -44,7 +44,7 @@ The United States government is said to be by the people, of the people, and for
 \section{Examining The Members of Senate}
 The NY Times Congress API provides an interface for accessing a number of characteristics on US Senators including their web presence, party and voting patterns. This provides us some introductory insights into the behavior of politicians elected by the US citizenry to represent them in the federal government.
 \subsection{How Have Senators Adopted Web Platforms Over Time?}
-The integration of technology into the modern American political process presents a number of interesting paradigms for exploration. For example, the electronic cataloguing and publication of Senate roll-call votes made all of this analysis possible in the first place, allowing for greater government transparency. 
+The integration of technology into the modern American political process presents a number of interesting paradigms for exploration. For example, the electronic cataloguing and publication of Senate roll-call votes made all of this analysis possible in the first place, allowing for greater government transparency.
 
 To begin our analysis, we turned to the use of web platforms by Senators. These platforms (including websites, Facebook, and Twitter) have become more common over time. Since the inception of FDR’s fireside chats, electronic media has permitted mass communication of political thought. This capacity has been greatly expanded by the internet. This plot shows that usage of the three platforms has grown rapidly, although the use of Facebook has lagged behind the use of websites and Twitter. High web-platform usage is not surprising given the number of Senators who host their websites under senate.gov sub-domains (name.senate.gov). Twitter also appears to be popular and is often utilized to disseminate political ideology and news.\footnote{For instance: \href{https://twitter.com/McConnellPress}{https://twitter.com/McConnellPress}}
 
@@ -69,19 +69,19 @@ To begin our analysis, we turned to the use of web platforms by Senators. These 
     ylab("\nProportion of Senators in Party\n")+
     scale_color_manual(values = c("dark blue", "#FF0000"))+
     ggtitle(expression(
-      atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
+      atop("Senators Who Have Ever Used a Web Platform In Their Political Career",
       atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
     ))
   #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
 \subsection{How many Terms do Senators Typically Serve?}
-Many Senators serve no more than 5 terms. Democrats and Republicans have similar distributions, although more Republicans serve 5-10 terms, while more Democrats serve greater than 10 terms.  
+Many Senators serve no more than 5 terms. Democrats and Republicans have similar distributions, although more Republicans serve 5-10 terms, while more Democrats serve greater than 10 terms.
 
 <<out.height="3in", out.width="8in", fig.width=8, fig.height=3, echo=FALSE>>==
   query = "
-    SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct 
-    FROM members 
-    WHERE party IN ('D', 'R') 
+    SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct
+    FROM members
+    WHERE party IN ('D', 'R')
     GROUP BY fullName
     ORDER BY ct DESC"
   senatorTotals = queryDB(query, "data.sqlite")
@@ -109,7 +109,7 @@ This figure is the culmination of an analysis of the power held by each of the p
     xlab("\nCongress Number\n")+
     scale_x_continuous(breaks=101:113)+
     ylab("\nProportion of Senate Seats\n")+
-    ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time", 
+    ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time",
       atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
   #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
@@ -126,7 +126,7 @@ There are 12 surnames held by more than one Senator over time in the Congresses 
 @
 \newpage
 \subsection{Do Certain States Prefer Certain Political Parties?}
-Over the course of the period examined, many states elected similar numbers of Senators from both major parties (shown in white). These are states in which senatorial elections may be more contentious. The states shown in red represent a Republican majority, and the states shown in blue represent a Democratic majority. Steadfast democratic states are primarily found in the Northeast, while states dominated by the Republican party are typically found in the South and Middle of America. The political, cultural, and economic histories of different regions of the United States account for the trends shown. 
+Over the course of the period examined, many states elected similar numbers of Senators from both major parties (shown in white). These are states in which senatorial elections may be more contentious. The states shown in red represent a Republican majority, and the states shown in blue represent a Democratic majority. Steadfast democratic states are primarily found in the Northeast, while states dominated by the Republican party are typically found in the South and Middle of America. The political, cultural, and economic histories of different regions of the United States account for the trends shown.
 
 <<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, message=FALSE, warning=FALSE>>=
   stateParty = queryDB("
@@ -144,7 +144,7 @@ Over the course of the period examined, many states elected similar numbers of S
     geom_map(data=statePartyWide, map=stateMap, aes(fill=diff, map_id=state), color="grey10")+
     scale_fill_gradient2(name="Party Difference\n(# Senators)", low="red", mid="white", high="navy blue")+
     ggtitle(expression(
-      atop("Party Preferences By State as Determined by Senate Seats", 
+      atop("Party Preferences By State as Determined by Senate Seats",
       atop(italic("Republicans (Red) vs. Democrats (Blue)")))
     ))+
     xlab("")+ylab("")+
@@ -172,8 +172,8 @@ Various bills are introduced to the Senate, but most fall into broad categories.
 
 <<tidy=FALSE, echo=FALSE, out.height="2.5in", out.width="7.5in", fig.width=7.5, fig.height=2.5>>==
   query <- "select * from
-            (select type, count(*) as ct 
-             from senateRollCalls 
+            (select type, count(*) as ct
+             from senateRollCalls
              group by type)
            where ct > 10"
   qtype <- queryDB(query, "data.sqlite")
@@ -208,15 +208,15 @@ After examining the overall distribution of bill types in Congresses 101-113, we
 Most bills initiated in the Senate are either passed or rejected. One would think that the percentage of bills passed would be fairly stable over time but the statistics suggest otherwise: the percentage of passed ”Amendment” bills consistently, but not significantly, decreased between Congress 107 and Congress 113; the percentage of passed ”Motion” experienced a soar in Congress 113. The soar could possibly be explained as the effect of the launch of Obamacare. Moreover, in general more bills were passed than were rejected, especially for the ”Others” category whose passing rate are constantly near 100 percent. The majority of passed bills may be explained by the fact that most bills are routine or do not have a serious impact (ex. changing the name of a national park).
 
 <<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5, cache=TRUE>>==
-  passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
-            from senateRollCalls 
+  passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt
+            from senateRollCalls
             where result == 'Agreed to'
                   or result == 'Confirmed'
-                  or result == 'Passed' 
+                  or result == 'Passed'
             group by congressNumber, type"
   passedResults <- queryDB(passedQuery, "data.sqlite")
-  failedQuery <- "select 'Fail' as res, congressNumber, type, count(*) as cnt 
-            from senateRollCalls 
+  failedQuery <- "select 'Fail' as res, congressNumber, type, count(*) as cnt
+            from senateRollCalls
             where result == 'Rejected'
             group by congressNumber, type"
   failedResults <- queryDB(failedQuery, "data.sqlite")
@@ -235,34 +235,53 @@ Most bills initiated in the Senate are either passed or rejected. One would thin
 A unanimously resolved bill is a bill that is either passed with fewer than 5 vetoes or rejected with fewer than 5 approvals. This plot shows that there are significantly more unanimously passed bills than failed bills, which is consistent with the fact that the majority of bills proposed in each of Congresses 101 through 113 were passed (4.2). The number of unanimously resolved bills per year is surprisingly high, perhaps because of the bipartisan nature of many bills.
 
 <<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5>>==
-  query <- "select pass, fail, p.congressNumber 
+  query <- "select pass, fail, p.congressNumber
             from
-            (select congressNumber, count(*) as Pass 
-             from senateRollCalls 
-             where  CAST(nays as INTEGER) <= 5 
+            (select congressNumber, count(*) as Pass
+             from senateRollCalls
+             where  CAST(nays as INTEGER) <= 5
              group by congressNumber) as p
             join
-            (select congressNumber, count(*) as Fail 
-             from senateRollCalls 
-             where  CAST(yeas as INTEGER) <= 5 
+            (select congressNumber, count(*) as Fail
+             from senateRollCalls
+             where  CAST(yeas as INTEGER) <= 5
              group by congressNumber) as f
             on p.congressNumber == f.congressNumber"
   unanimous <- queryDB(query, "data.sqlite")
   unanimous$congressNumber <- factor(unanimous$congressNumber)
   unanimous <- melt(unanimous[,c('congressNumber','Pass','Fail')],id.vars = 1)
-  ggplot(unanimous,aes(x = congressNumber,y = value)) + 
+  ggplot(unanimous,aes(x = congressNumber,y = value)) +
     geom_bar(stat='identity',aes(fill = variable),position = "dodge")+
     scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
     xlab("\nCongress Number\n") +
     ylab("\nNumber of Bills\n") +
     ggtitle(expression(
-      atop("Number of Bills Resolved Unanimously Per Congress", 
+      atop("Number of Bills Resolved Unanimously Per Congress",
       atop(italic("Bills with 5 or Fewer Dissenting Votes")))
     ))
   #ggsave("fig5.png", width = 11, height = 6, dpi = 600)
 @
 \section{An Analysis of Voting Patterns Using Roll-Call Votes with Individual Senator Resolutions}
 In the previous section, we examined the overall trends in bill passage in the US Senate. For each of the roll-call votes we examined in our analysis, there is a corresponding list of each Senator’s vote: Yea or Nay. We retrieved this data from govtrack.org. Examining individual votes allows us to examine trends in variance of votes within a party and between parties, and this variance may be due to factors such as domestic affairs, politics, and foreign relations.
+\subsection{Do Senators Typically Vote Along Their Party Lines?}
+For all of the Congresses examined, the majority of both Democratic and Republican Senators voted over 80 percent of the time with their party. There is a small and steady increase between Congresses 101 and 109 in Senators voting with their party. In Congress 110, a discrepancy emerged: most Democrats began to vote 90 percent of the time or more with their party, while most Republicans fell to voting under 90 percent of the time with their party. This trend may correlate with the Obama presidency, which began in 2008 (Congress 110 began in 2007).
+
+<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE, warning=FALSE>>=
+  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')", "data.sqlite")
+  memberPct$withParty = as.integer(as.character(memberPct$withParty))
+  memberPct$congressNumber = as.factor(memberPct$congressNumber)
+  ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
+    geom_boxplot()+
+    xlab("\nYear\n")+
+    ylab("\nPercentage of Votes With Party\n")+
+    scale_fill_manual(name="Party", values = c("royal blue", "red"))+
+    ggtitle(expression(
+      atop("Senators Typically Vote Along their Party Lines",
+      atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
+    ))
+  #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
+@
+\newpage
 \subsection{Do Senators Vote Yea/Nay more in a Given Year?}
 Data on individual votes is consistent with roll-call vote data in that the majority of Senators in nearly if not all years from 1989-2014 vote yea more often than nay (4.3). However, investigation of the number of yae/nay votes of individual Senators is correlated with political party, as shown through the clustering of red dots in the figure below, each symbolizing one Republican Senator and the clustering of blue dots, each symbolizing one Democratic Senator, for each year. Certain years have more variance, which follows from a greater divide between party voting for a particular year. Years with a particularly great divide between the difference in yae and nae votes per Senator are 1993, 1995, 2005, and 2014. These difference may be due to political events, such as the Republican Revolution in 1995, during which the GOP experienced great success in the US Midterm Elections (the plot shows a significantly greater number of yaes-nays for Republicans than for Democrats. For the majority of years from 1989-2015, the difference yae - nay for Democrats is greater than for Republicans, except between 1995 and 1999.
 
@@ -277,7 +296,7 @@ Data on individual votes is consistent with roll-call vote data in that the majo
     xlab("\nYear\n")+
     ylab("\nDifference between Number of Yea/Nay Votes By Senator\n")+
     ggtitle(expression(
-      atop("Number of Bills Approved By Senators Changes by Year", 
+      atop("Number of Bills Approved By Senators Changes by Year",
       atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
     ))+
     coord_flip()
@@ -285,37 +304,19 @@ Data on individual votes is consistent with roll-call vote data in that the majo
   #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
-\subsection{Do Senators Typically Vote Along Their Party Lines?}
-For all of the Congresses examined, the majority of both Democratic and Republican Senators voted over 80 percent of the time with their party. There is a small and steady increase between Congresses 101 and 109 in Senators voting with their party. In Congress 110, a discrepancy emerged: most Democrats began to vote 90 percent of the time or more with their party, while most Republicans fell to voting under 90 percent of the time with their party. This trend may correlate with the Obama presidency, which began in 2008 (Congress 110 began in 2007). 
 
-<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE, warning=FALSE>>=
-  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')", "data.sqlite")
-  memberPct$withParty = as.integer(as.character(memberPct$withParty))
-  memberPct$congressNumber = as.factor(memberPct$congressNumber)
-  ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
-    geom_boxplot()+
-    xlab("\nYear\n")+
-    ylab("\nPercentage of Votes With Party\n")+
-    scale_fill_manual(name="Party", values = c("royal blue", "red"))+
-    ggtitle(expression(
-      atop("Senators Typically Vote Along their Party Lines", 
-      atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
-    ))
-  #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
-@
-\newpage
 \section{Concluding Thoughts}
-In accord with popular belief, the United States Senate is a bipartisan political body, as we proved. The Republican and Democratic parties constantly grapple for majority seats in both houses of Congress, as we showed that they do in the Senate. 
+In accord with popular belief, the United States Senate is a bipartisan political body, as we proved. The Republican and Democratic parties constantly grapple for majority seats in both houses of Congress, as we showed that they do in the Senate.
 
 With our plot on web platforms (3.1), we showed that the parties both adopt the technologies and in turn, perhaps social norms of their time. This provides insight into the possibility of the parties’ evolution over time. Republican and Democratic political platforms have transformed ever since the parties became the authorities of American politics in the 1800’s. The parties have become more similar in certain ways, such as by adopting a position of anti-slavery, but they have switched general positions on certain major issues such as on economic ideology. Our plot is a preliminary analysis of the fluid modernization of behavior and adoption of social norms of the US government. Techniques similar to the ones we used in our analysis of web platforms can be used on data about Republican and Democratic ideology and other political tools over time to increase transparency of the political parties that dominate US politics and their interactions with one another.
 
-There are several advantages to having a two-party system. Bipartisan governments generally tend to be more efficient and more easily managed than those with multiple parties, and two-party system may be the reason for the majority of bills being passed in the US Senate (4.3). In addition, a two-party system intuitively makes the voting system less complicated for voters. However, with only two options, voters may not entirely agree with either party. Gridlock is also a major concern, as is corruption. 
+There are several advantages to having a two-party system. Bipartisan governments generally tend to be more efficient and more easily managed than those with multiple parties, and two-party system may be the reason for the majority of bills being passed in the US Senate (4.3). In addition, a two-party system intuitively makes the voting system less complicated for voters. However, with only two options, voters may not entirely agree with either party. Gridlock is also a major concern, as is corruption.
 
-With Senate seats held by Republicans and Democrats almost evenly with power shifting between parties over terms (3.3), gridlock has the potential to occur often and lead to the discontent of the American public with their government. Further analysis on the frequency of gridlock within the Senate and between the Senate, House of Republicans, and Executive Branch will reveal truths about the efficiency of the US bipartisan system. 
+With Senate seats held by Republicans and Democrats almost evenly with power shifting between parties over terms (3.3), gridlock has the potential to occur often and lead to the discontent of the American public with their government. Further analysis on the frequency of gridlock within the Senate and between the Senate, House of Republicans, and Executive Branch will reveal truths about the efficiency of the US bipartisan system.
 
-Table 3.4 suggests the possibility of corruption in the US Senate through nepotism. In a country of 318 million individuals, the objective likelihood of relatives serving in the Senate is incredibly low, but the data shows that the phenomenon does in fact occur. Further analysis into individuals’ voting patterns on specific votes, the effects lobbying, and other political persuasion can gain more insight into the true extent of corruption in the US government. 
+Table 3.4 suggests the possibility of corruption in the US Senate through nepotism. In a country of 318 million individuals, the objective likelihood of relatives serving in the Senate is incredibly low, but the data shows that the phenomenon does in fact occur. Further analysis into individuals’ voting patterns on specific votes, the effects lobbying, and other political persuasion can gain more insight into the true extent of corruption in the US government.
 
-Politics between Republicans and Democrats bleed into controversial domestic issues and topics such as gun control, abortion, and gay marriage as well as into foreign policy issues such as isolationism versus interventionism, wars, and international trade and economics. In order to fully achieve governmental transparency, a lengthy and deep analysis should be done on the hundreds or thousands of variables that may affect the legislative outcomes of Congress, as well as the outcomes of the Executive and Judicial branches of the US government. Our analysis of the US Senate is a preliminary investigation of the possibilities for achieving governmental transparency. The thought-process and techniques created and utilized in our report can sufficiently be used to model countless datasets in order to entirely lift the barrier between the US government and the people of the United States of America. 
+Politics between Republicans and Democrats bleed into controversial domestic issues and topics such as gun control, abortion, and gay marriage as well as into foreign policy issues such as isolationism versus interventionism, wars, and international trade and economics. In order to fully achieve governmental transparency, a lengthy and deep analysis should be done on the hundreds or thousands of variables that may affect the legislative outcomes of Congress, as well as the outcomes of the Executive and Judicial branches of the US government. Our analysis of the US Senate is a preliminary investigation of the possibilities for achieving governmental transparency. The thought-process and techniques created and utilized in our report can sufficiently be used to model countless datasets in order to entirely lift the barrier between the US government and the people of the United States of America.
 
 
 \newpage
@@ -358,26 +359,26 @@ source("../voteAnalysis.R")
 How Have Senators Adopted Web Platforms Over Time?
 <<eval=FALSE>>=
 websiteCt = queryDB("
-  SELECT party as Party, congressNumber, count(*) as webct 
-  FROM members 
-  WHERE URL!='' AND Party!='I' 
+  SELECT party as Party, congressNumber, count(*) as webct
+  FROM members
+  WHERE URL!='' AND Party!='I'
   GROUP BY party, congressNumber
 ")
 twitterCt = queryDB("
-  SELECT party as Party, congressNumber, count(*) as twitterct 
-  FROM members 
-  WHERE twitter_account!='' 
-  AND Party!='I' 
+  SELECT party as Party, congressNumber, count(*) as twitterct
+  FROM members
+  WHERE twitter_account!=''
+  AND Party!='I'
   GROUP BY party, congressNumber")
 fbCt = queryDB("
   SELECT party as Party, congressNumber, count(*) as fbct
-  FROM members 
-  WHERE facebook_account!='' AND Party!='I' 
+  FROM members
+  WHERE facebook_account!='' AND Party!='I'
   GROUP BY party, congressNumber")
 totalCt = queryDB("
-  SELECT party as Party, congressNumber, count(*) as totalct 
-  FROM members 
-  WHERE Party!='I' 
+  SELECT party as Party, congressNumber, count(*) as totalct
+  FROM members
+  WHERE Party!='I'
   GROUP BY party, congressNumber")
 mediaCt = merge(websiteCt, twitterCt, by=c("Party", "congressNumber"))
 mediaCt = merge(mediaCt, fbCt, by=c("Party", "congressNumber"))
@@ -385,7 +386,7 @@ mediaCt = merge(mediaCt, totalCt, by=c("Party", "congressNumber"))
 mediaCt$Website = mediaCt$webct/mediaCt$totalct
 mediaCt$Twitter = mediaCt$twitterct/mediaCt$totalct
 mediaCt$Facebook = mediaCt$fbct/mediaCt$totalct
-mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"), 
+mediaPlotData = melt(mediaCt, measure.vars = c("Website", "Facebook", "Twitter"),
   id.vars = c("Party", "congressNumber"))
 ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
   geom_point()+
@@ -396,7 +397,7 @@ ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
   ylab("\nProportion of Senators in Party\n")+
   scale_color_manual(values = c("dark blue", "#FF0000"))+
   ggtitle(expression(
-    atop("Senators Who Have Ever Used a Web Platform In Their Political Career", 
+    atop("Senators Who Have Ever Used a Web Platform In Their Political Career",
     atop(italic("Facebook Appears to Lag Behind Websites and Twitter")))
   ))
 #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
@@ -404,9 +405,9 @@ ggplot(mediaPlotData, aes(x=congressNumber, y=value, color=Party))+
 How many Terms do Senators Typically Serve?
 <<eval=FALSE>>==
 query = "
-  SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct 
-  FROM members 
-  WHERE party IN ('D', 'R') 
+  SELECT (first_name || ' ' || last_name) as fullName, party, count(*) AS ct
+  FROM members
+  WHERE party IN ('D', 'R')
   GROUP BY fullName
   ORDER BY ct DESC"
 senatorTotals = queryDB(query, "data.sqlite")
@@ -431,16 +432,16 @@ ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+
   xlab("\nCongress Number\n")+
   scale_x_continuous(breaks=101:113)+
   ylab("\nProportion of Senate Seats\n")+
-  ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time", 
+  ggtitle(expression(atop("Senate Seats Held Per Party Is Fairly Stable over Time",
     atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
 #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
 How Often do Multiple Senators Share a Surname?
 <<eval=FALSE>>==
 lastCounts=queryDB("
-  SELECT tab.last_name as last, count(*) as lastct 
-  FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct 
-  FROM members GROUP BY full_name ORDER BY ct) AS tab 
+  SELECT tab.last_name as last, count(*) as lastct
+  FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct
+  FROM members GROUP BY full_name ORDER BY ct) AS tab
   GROUP BY last ORDER BY lastct DESC", "data.sqlite")
 lastCounts = lastCounts[lastCounts$lastct>1,]
 colnames(lastCounts) = c("Last Name", "# of Senators")
@@ -463,7 +464,7 @@ ggplot(statePartyWide)+
   geom_map(data=statePartyWide, map=stateMap, aes(fill=diff, map_id=state), color="grey10")+
   scale_fill_gradient2(name="Party Difference\n(# Senators)", low="red", mid="white", high="navy blue")+
   ggtitle(expression(
-    atop("Party Preferences By State as Determined by Senate Seats", 
+    atop("Party Preferences By State as Determined by Senate Seats",
     atop(italic("Republicans (Red) vs. Democrats (Blue)")))
   ))+
   xlab("")+ylab("")+
@@ -474,9 +475,9 @@ ggplot(statePartyWide)+
 Who are the Independent Senators? Where are They Elected?
 <<eval=FALSE>>==
 indep = queryDB("
-  SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes 
-  FROM members 
-  WHERE party='I' 
+  SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes
+  FROM members
+  WHERE party='I'
   ORDER BY state", "data.sqlite")
 colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
 print(xtable(indep), include.rownames = FALSE)
@@ -485,8 +486,8 @@ print(xtable(indep), include.rownames = FALSE)
 What Types of Roll-Call Votes are Handled by the US Senate?
 <<eval=FALSE>>==
 query <- "select * from
-          (select type, count(*) as ct 
-           from senateRollCalls 
+          (select type, count(*) as ct
+           from senateRollCalls
            group by type)
          where ct > 10"
 qtype <- queryDB(query, "data.sqlite")
@@ -515,15 +516,15 @@ ggplot(typeOverYear) +
 @
 How Does the Percentage of Passed Bills Change Over Time?
 <<eval=FALSE>>==
-passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt 
-          from senateRollCalls 
+passedQuery <- "select 'Pass' as res, congressNumber, type, count(*) as cnt
+          from senateRollCalls
           where result == 'Agreed to'
                 or result == 'Confirmed'
-                or result == 'Passed' 
+                or result == 'Passed'
           group by congressNumber, type"
 passedResults <- queryDB(passedQuery, "data.sqlite")
-failedQuery <- "select 'Fail' as res, congressNumber, type, count(*) as cnt 
-          from senateRollCalls 
+failedQuery <- "select 'Fail' as res, congressNumber, type, count(*) as cnt
+          from senateRollCalls
           where result == 'Rejected'
           group by congressNumber, type"
 failedResults <- queryDB(failedQuery, "data.sqlite")
@@ -540,32 +541,70 @@ ggplot(results) + aes(x=congressNumber, y=cnt, fill=res) +
 @
 Are Bills that Received Unanimous Votes Typically Passed or Failed?
 <<eval=FALSE>>==
-query <- "select pass, fail, p.congressNumber 
+query <- "select pass, fail, p.congressNumber
           from
-          (select congressNumber, count(*) as Pass 
-           from senateRollCalls 
-           where  CAST(nays as INTEGER) <= 5 
+          (select congressNumber, count(*) as Pass
+           from senateRollCalls
+           where  CAST(nays as INTEGER) <= 5
            group by congressNumber) as p
           join
-          (select congressNumber, count(*) as Fail 
-           from senateRollCalls 
-           where  CAST(yeas as INTEGER) <= 5 
+          (select congressNumber, count(*) as Fail
+           from senateRollCalls
+           where  CAST(yeas as INTEGER) <= 5
            group by congressNumber) as f
           on p.congressNumber == f.congressNumber"
 unanimous <- queryDB(query, "data.sqlite")
 unanimous$congressNumber <- factor(unanimous$congressNumber)
 unanimous <- melt(unanimous[,c('congressNumber','Pass','Fail')],id.vars = 1)
-ggplot(unanimous,aes(x = congressNumber,y = value)) + 
+ggplot(unanimous,aes(x = congressNumber,y = value)) +
   geom_bar(stat='identity',aes(fill = variable),position = "dodge")+
   scale_fill_manual(name = "Resolution", values = c("Pass"="#339933", "Fail"="red")) +
   xlab("\nCongress Number\n") +
   ylab("\nNumber of Bills\n") +
   ggtitle(expression(
-    atop("Number of Bills Resolved Unanimously Per Congress", 
+    atop("Number of Bills Resolved Unanimously Per Congress",
     atop(italic("Bills with 5 or Fewer Dissenting Votes")))
   ))
 #ggsave("fig5.png", width = 11, height = 6, dpi = 600)
 @
 \subsubsection*{Section 5 Figures:}
+Do Senators Typically Vote Along Their Party Lines?
+<<eval=FALSE>>=
+memberPct = queryDB("
+  SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, 
+  next_election as nextElection, congressNumber 
+  FROM members 
+  WHERE party in ('D', 'R')")
+memberPct$withParty = as.integer(as.character(memberPct$withParty))
+memberPct$congressNumber = as.factor(memberPct$congressNumber)
+ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
+  geom_boxplot()+
+  xlab("\nYear\n")+
+  ylab("\nPercentage of Votes With Party\n")+
+  scale_fill_manual(name="Party", values = c("royal blue", "red"))+
+  ggtitle(expression(
+    atop("Senators Typically Vote Along their Party Lines",
+    atop(italic("% of Votes Has Increased Among Democrats in Recent Years")))
+  ))
+#ggsave("fig7.png", width = 11, height = 6, dpi = 600)
+@
+Do Senators Vote Yea/Nay more in a Given Year?
+<<eval=FALSE>>=
+  votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
+  votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
+  votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
+  ggplot(votedatawide, aes(x=as.factor(year), y=diff))+
+    geom_boxplot()+
+    geom_jitter(aes(color=party), alpha=.8)+
+    scale_color_manual(name="Party", values=c("royal blue", "red"))+
+    xlab("\nYear\n")+
+    ylab("\nDifference between Number of Yea/Nay Votes By Senator\n")+
+    ggtitle(expression(
+      atop("Number of Bills Approved By Senators Changes by Year",
+      atop(italic("There is Clear Separation of Party Voting Patterns in Many Congresses")))
+    ))+
+    coord_flip()
 
+  #ggsave("fig6.png", width = 11, height = 6, dpi = 600)
+@
 \end{document}
