@@ -8,6 +8,12 @@ require(XML)
 source("config.R")
 source("fetchJSON.R")
 source("fetchXML.R")
+#Write to db
+tableWriter = function(data, tablename){
+  dbcon = dbConnect(SQLite(), dbname="data.sqlite")
+  dbWriteTable(dbcon, tablename, data, overwrite=TRUE);
+  dbDisconnect(dbcon);
+}
 #Fetch session data for determining which years align with a given congress session
 sesh = read.delim("data/sessions.tsv")
 range = 101:113

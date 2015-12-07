@@ -300,7 +300,7 @@ Content needed here.
   memberPct$congressNumber = as.factor(memberPct$congressNumber)
   ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
     geom_boxplot()+
-    xlab("\nCongress Number\n")+
+    xlab("\nYear\n")+
     ylab("\nPercentage of Votes With Party\n")+
     ylim(50, 100)+
     scale_fill_manual(name="Party", values = c("royal blue", "red"))+
@@ -317,8 +317,15 @@ Content needed here.
 \subsection{Appendix A: Data fetching and Pre-processing}
 Three supplementary R files are included with this analysis. These contain the R code used to fetch and clean the data (divided by filetype) from our three sources:
 
-\href{}{fetchJSON.R} - This script contains the functions required to download data from the New York Times Congress and govtrack.org role-call vote APIs:
+\href{https://github.com/jpoles1/finalStat405/blob/master/fetchJSON.R}{fetchJSON.R} - This script contains the functions required to download data from the New York Times Congress and govtrack.org role-call vote APIs:
 
+\begin{enumerate}
+  \item fetchJSON - takes a URL and returns a JSON formatted string.
+  \item fetchCongressMembers - takes a congress number and chamber; returns a cleaned Senate membership dataframe
+  \item fetchAllMembers - uses the above function to fetch senate members over a range of congresses; then assembles into one dataframe before exporting to SQLite.
+  \item fetchVote - Retrieves the roll-call record for a single vote from govtrack.org
+  \item fetchVotes - Takes a dataframe of roll-call votes and uses the above function to retreive all votes. Saves to SQLite.
+\end{enumerate}
 fetchData.R - This Script fetches all of the datasets and stores them in a SQLite database file (data.sqlite). The fetching and handling JSON files from 
 
 
