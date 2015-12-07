@@ -23,9 +23,10 @@ This report details our analysis of a dataset covering the 101st to the 113th US
   \end{enumerate}
   \item The Senate provided the lists of roll call votes used in our analysis in a much more accessible format (XML) than the House of Representatives (HTML).
 \end{enumerate}
-To begin our analysis, we examined the characteristics of the senators who participated in each of Congresses 101 - 113 using the NY Times \href{http://developer.nytimes.com/docs/congress_api}{Congress API}. We refer to this data as “member data” for the remainder of this report. The dataset of member data was made retrieved as JSON from a URI based API. These JSON files - as well as all of the other datafiles we fetched - were cleaned by an R script prior to storage in a SQLite database for analysis. This data was stored in the ”members” table, and contains a variety of variables including identifiers such as name, ID, party, state, and seniority in addition to metrics such as percentage of votes with party and vote miss rate. 
+To begin our analysis, we examined the characteristics of the senators who participated in each of Congresses 101 - 113 using the NY Times \href{http://developer.nytimes.com/docs/congress_api}{Congress API}. We refer to this data as “member data” for the remainder of this report. The member dataset was made retrieved as JSON via several calls to a URI based API. These JSON files - as well as all of the other datafiles we fetched - were cleaned by an R script (Appendix A) prior to storage in a SQLite database for analysis. This data was stored in the ”members” table, and contains a variety of variables including identifiers such as name, ID, party, state, and seniority in addition to metrics such as percentage of votes with party and vote miss rate. 
 
 The member data motivated us to examine the voting behavior of senators. We proceeded to examine the bills which were voted on in each session of the Senate. Our analysis focuses on roll-call bills - those bills for which the vote of each senator is individually recorded. In order to examine these bills we first fetched a series of files from \href{http://www.senate.gov/legislative/votes.htm}{senate.gov} containing lists of roll-call votes (and metadata) for each session (or year) of congress in an XML format. These data were stored in the ”senateRollCalls” table, which contains the date of each vote, the issue at hand, and the outcome (overall number of yeas and nays). We refer to this as “roll-call vote data”.  
+
 The roll-call vote data from the Senate offers information about passage rates for individual bills but it does not reveal individual voting behaviour. This data was retrieved using our third and final data-source, \href{govtrack.org}{govtrack.org}, in the interest of compiling a complete list of roll-call votes for lookup. The govtrack group provides a bulk data API which can be used to lookup the vote of each individual senator on a given bill. This data was retrieved as JSON before being stored in our third table ”votes”. We used this information to examine each Senator’s voting behavior individually in relation to corresponding parties or congresses.
 
 \section{The Importance of Assessing our Government}
@@ -372,4 +373,10 @@ query = "select r.year as year, r.voteNumber as voteNumber,
   @
 \section{Concluding Thoughts}
 Content needed here.
+\section{Appendix}
+\subsection{Appendix A: Data fetching and Pre-processing}
+Two supplementary R files are included with this analysis. These contain the R code used to fetch the data (divided by filetype) from our three sources:
+\begin{enumerate}
+  \item congressAPI.R - This Script fetches all of the datasets and stores them in a SQLite database file (data.sqlite). The fetching and handling JSON files from 
+\end{enumerate}
 \end{document}
