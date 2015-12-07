@@ -40,7 +40,6 @@ The United States government is said to be by the people, of the people, and for
   require(xtable)
   source("../config.R")
   source("../voteAnalysis.R")
-  getwd()
 @
 \section{Examining The Members of Senate}
 The NY Times Congress API provides an interface for accessing a number of characteristics on US Senators including their web presence, party and voting patterns. This provides us some introductory insights into the behavior of politicians elected by the US citizenry to represent them in the federal government.
@@ -280,7 +279,7 @@ In the previous section, we examined the overall trends in bill passage in the U
 \subsection{Do Senators Vote Yea/Nay more in a Given Year?}
 Data on individual votes is consistent with roll-call vote data in that the majority of Senators in nearly if not all years from 1989-2014 vote yea more often than nay (4.3). However, investigation of the number of yae/nay votes of individual Senators is correlated with political party, as shown through the clustering of red dots in the figure below, each symbolizing one Republican Senator and the clustering of blue dots, each symbolizing one Democratic Senator, for each year. Certain years have more variance, which follows from a greater divide between party voting for a particular year. Years with a particularly great divide between the difference in yae and nae votes per Senator are 1993, 1995, 2005, and 2014. These difference may be due to political events, such as the Republican Revolution in 1995, during which the GOP experienced great success in the US Midterm Elections (the plot shows a significantly greater number of yaes-nays for Republicans than for Democrats. For the majority of years from 1989-2015, the difference yae - nay for Democrats is greater than for Republicans, except between 1995 and 1999.
 
-<<echo=FALSE, warning=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE>>=
+<<echo=FALSE, warning=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE>>=
   votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
@@ -302,7 +301,7 @@ Data on individual votes is consistent with roll-call vote data in that the majo
 \subsection{Do Senators Typically Vote Along Their Party Lines?}
 For all of the Congresses examined, the majority of both Democratic and Republican Senators voted over 80 percent of the time with their party. There is a small and steady increase between Congresses 101 and 109 in Senators voting with their party. In Congress 110, a discrepancy emerged: most Democrats began to vote 90 percent of the time or more with their party, while most Republicans fell to voting under 90 percent of the time with their party. This trend may correlate with the Obama presidency, which began in 2008 (Congress 110 began in 2007). 
 
-<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, warning=FALSE>>=
+<<echo=FALSE, out.height="6.5in", out.width="8in", fig.width=8, fig.height=6.5, cache=TRUE, warning=FALSE>>=
   memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')", "data.sqlite")
   memberPct$withParty = as.integer(as.character(memberPct$withParty))
   memberPct$congressNumber = as.factor(memberPct$congressNumber)
@@ -310,7 +309,6 @@ For all of the Congresses examined, the majority of both Democratic and Republic
     geom_boxplot()+
     xlab("\nYear\n")+
     ylab("\nPercentage of Votes With Party\n")+
-    ylim(50, 100)+
     scale_fill_manual(name="Party", values = c("royal blue", "red"))+
     ggtitle(expression(
       atop("Senators Typically Vote Along their Party Lines", 
@@ -333,7 +331,7 @@ Table 3.4 suggests the possibility of corruption in the US Senate through nepoti
 Politics between Republicans and Democrats bleed into controversial domestic issues and topics such as gun control, abortion, and gay marriage as well as into foreign policy issues such as isolationism versus interventionism, wars, and international trade and economics. In order to fully achieve governmental transparency, a lengthy and deep analysis should be done on the hundreds or thousands of variables that may affect the legislative outcomes of Congress, as well as the outcomes of the Executive and Judicial branches of the US government. Our analysis of the US Senate is a preliminary investigation of the possibilities for achieving governmental transparency. The thought-process and techniques created and utilized in our report can sufficiently be used to model countless datasets in order to entirely lift the barrier between the US government and the people of the United States of America. 
 
 
-
+\newpage
 \section{Appendix}
 \subsection{Appendix A: Data fetching and Pre-processing}
 Three supplementary R files are included with this analysis. These contain the R code used to fetch and clean the data (divided by filetype) from our three sources:
