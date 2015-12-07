@@ -11,7 +11,7 @@
 }
 \begin{document}
 \title{A Retrospective Exploration of the US Senate through Data}
-\author{Jordan Poles, Tony Chen and Aparna Narendrula}
+\author{Jordan Poles, Tony Chen, and Aparna Narendrula}
 \maketitle
 \section{An Introduction to the Data}
 This report details our analysis of a dataset covering the 101st to the 113th US Congresses (1989 - 2014). The dataset was extracted from several sources, and our goal was to use this data to assess trends in the members of the US Congress, their voting patterns and bills passed by this body. We focused on understanding the US Senate, which is one of the two chambers of Congress (the other being the House of Representatives). We selected the Senate for two reasons:
@@ -40,10 +40,11 @@ The United States government is said to be by the people, of the people, and for
   require(xtable)
   source("../config.R")
   source("../voteAnalysis.R")
+  getwd()
 @
 \section{Examining The Members of Senate}
 The NY Times Congress API provides an interface for accessing a number of characteristics on US Senators including their web presence, party and voting patterns. This provides us some introductory insights into the behavior of politicians elected by the US citizenry to represent them in the federal government.
-\subsection{How have senators adopted web platforms over time?}
+\subsection{How Have Senators Adopted Web Platforms Over Time?}
 The integration of technology into the modern American political process presents a number of interesting paradigms for exploration. For example, the electronic cataloguing and publication of Senate roll-call votes made all of this analysis possible in the first place, allowing for greater government transparency. 
 
 To begin our analysis, we turned to the use of web platforms by Senators. These platforms (including websites, Facebook, and Twitter) have become more common over time. Since the inception of FDR’s fireside chats, electronic media has permitted mass communication of political thought. This capacity has been greatly expanded by the internet. This plot shows that usage of the three platforms has grown rapidly, although the use of Facebook has lagged behind the use of websites and Twitter. High web-platform usage is not surprising given the number of Senators who host their websites under senate.gov sub-domains (name.senate.gov). Twitter also appears to be popular and is often utilized to disseminate political ideology and news.\footnote{For instance: \href{https://twitter.com/McConnellPress}{https://twitter.com/McConnellPress}}
@@ -74,7 +75,7 @@ To begin our analysis, we turned to the use of web platforms by Senators. These 
     ))
   #ggsave("fig1.png", width = 11, height = 6, dpi = 600)
 @
-\subsection{For how many terms do Senators typically serve?}
+\subsection{How many Terms do Senators Typically Serve?}
 Many Senators serve no more than 5 terms. Democrats and Republicans have similar distributions, although more Republicans serve 5-10 terms, while more Democrats serve greater than 10 terms.  
 
 <<out.height="3in", out.width="8in", fig.width=8, fig.height=3, echo=FALSE>>==
@@ -94,7 +95,7 @@ Many Senators serve no more than 5 terms. Democrats and Republicans have similar
     ggtitle("Distribution of Terms Served in 101st to 113th Senates")
 @
 \newpage
-\subsection{What are the dynamics of political parties in the US Senate over time?}
+\subsection{What are the Dynamics of Political Parties in the US Senate Over Time?}
 This figure is the culmination of an analysis of the power held by each of the political parties in the US Senate. We confirm the prevailing understanding of American politics as a system dominated by two major political parties (a bipartisan system). In recent years, an independent party has emerged. However, since then the party has not grown significantly, as they have never held more than 2 seats at a time. The one minor party featured in this plot is the Iowa Democrats (an offshoot of the Democratic party). They have only ever held two seats in the US Senate but hold a good deal of power in the state. The party also has noteworthy involvement in the Iowa Caucuses, which are important for presidential elections.\footnote{\href{http://iowademocrats.org/}{http://iowademocrats.org/}}.
 
 <<echo=FALSE, out.height="5.5in", out.width="8in", fig.width=8, fig.height=5.5, cache=TRUE>>=
@@ -113,7 +114,7 @@ This figure is the culmination of an analysis of the power held by each of the p
       atop(italic("Republicans and Democrats Hold Majority of Seats; Independents New on the Scene")))))
   #ggsave("fig2.png", width = 11, height = 6, dpi = 600)
 @
-\subsection{How often do multiple senators share a surname?}
+\subsection{How Often do Multiple Senators Share a Surname?}
 There are 12 surnames held by more than one Senator over time in the Congresses examined. Several Senators who share a surname are related, indicating the possibility of some degree of nepotism in the Senate. For instance, in Rhode Island, the Chafee family has held Senate seats for over three decades. John Chafee (R) held the seat from 1976-1999,\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}} and his son Lincoln Chafee (R) (who made a run for President in 2016 but has already dropped out) held the seat directly after him from 1999-2007.\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}} This suggests that some families have a high level of power in US governance (another instance is the Clinton Family).
 \newline
 \newline
@@ -125,7 +126,7 @@ There are 12 surnames held by more than one Senator over time in the Congresses 
   print(xtable(t(lastCounts)), include.colnames=FALSE)
 @
 \newpage
-\subsection{Do certain states prefer certain political parties?}
+\subsection{Do Certain States Prefer Certain Political Parties?}
 Over the course of the period examined, many states elected similar numbers of Senators from both major parties (shown in white). These are states in which senatorial elections may be more contentious. The states shown in red represent a Republican majority, and the states shown in blue represent a Democratic majority. Steadfast democratic states are primarily found in the Northeast, while states dominated by the Republican party are typically found in the South and Middle of America. The political, cultural, and economic histories of different regions of the United States account for the trends shown. 
 
 <<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, message=FALSE, warning=FALSE>>=
@@ -165,7 +166,7 @@ Over the course of the period examined, many states elected similar numbers of S
     scale_x_continuous(breaks=NULL)+
     scale_y_continuous(breaks=NULL)
 @
-\subsection{Who are the independent senators? Where are they elected?}
+\subsection{Who are the Independent Senators? Where are They Elected?}
 Given that independent Senators are a small cohort, we decided that the independent senators deserved some analytical consideration. We note that the majority of elections won by independent Senators are in the state of Vermont (VT) and that there are a small overall number of candidates per number of elections won. Senator Barkley (I) had a small number of votes. Further research revealed that he temporarily held the chair of Senator Paul Wellstone, who died in a plane crash.\footnote{\href{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}}
 \newline
 \newline
@@ -180,7 +181,7 @@ Given that independent Senators are a small cohort, we decided that the independ
 \newpage
 \section{Examining Patterns in Bill Passage}
 The United States Senate maintains an archive of roll-call votes - those votes in which the vote of each individual senator is recorded, rather than just having an overall tally - accessible via a series of folders on their servers containing XML files. We parsed these XML files using the code found in Appendix A
-\subsection{What types of roll-call votes are handled By US Senate?}
+\subsection{What Types of Roll-Call Votes are Handled by the US Senate?}
 Various bills are introduced to the Senate, but most fall into broad categories. After plotting counts of bills, we found that two categories of bills account for most bills in the Senate: one that initiates a motion to the table and one that is related to certain amendments. Both of these categories has a count of more than 3500. All other kinds of bills only count to about 1400 in total, so we synthesized them into one distinct category: ”Others”.
 
 <<tidy=FALSE, echo=FALSE, out.height="2.5in", out.width="7.5in", fig.width=7.5, fig.height=2.5>>==
@@ -199,7 +200,7 @@ Various bills are introduced to the Senate, but most fall into broad categories.
   coord_flip()
 @
 
-\subsection{How have Trends in Bill Type Changed over Time?}
+\subsection{How Have Trends in Bill Type Changed over Time?}
 After examining the overall distribution of bill types in Congresses 101-113, we investigated trends in the changing number of bills of the three bill types (see 4.1) over time. We expected that bill types distribution would be fairly stable over time, but Plot 7 shows the counts of the two majority categories (”Amendment” and ”Motion”) are randomly oscillating, indicating the lack of a clear pattern. However, in the majority of years examined, between 100 and 200 bills were “Amendment” and “Motion”, while typically under 100 bills were in the category “Other”, which is consistent with bill type data over time. In addition, there are peaks for both ”Amendment” and ”Motion” in 1995, indicated that the Senate was particularly busy that year, perhaps as a consequence of the 1995 Republican Revolution (see Plot 10). Also, in 2014, the count of bills regarding amendments dropped significantly, while the count of other bills increased significantly, perhaps due to Obamacare taking effect in that year.
 
 <<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5>>==
@@ -217,7 +218,7 @@ After examining the overall distribution of bill types in Congresses 101-113, we
     ggtitle("Changes in Types of Bills Before US Senate Over Time\n")
 @
 
-\subsection{How does the percentage of passed bills change over time?}
+\subsection{How Does the Percentage of Passed Bills Change Over Time?}
 Most bills initiated in the Senate are either passed or rejected. One would think that the percentage of bills passed would be fairly stable over time but the statistics suggest otherwise: the percentage of passed ”Amendment” bills consistently, but not significantly, decreased between Congress 107 and Congress 113; the percentage of passed ”Motion” experienced a soar in Congress 113. The soar could possibly be explained as the effect of the launch of Obamacare. Moreover, in general more bills were passed than were rejected, especially for the ”Others” category whose passing rate are constantly near 100 percent. The majority of passed bills may be explained by the fact that most bills are routine or do not have a serious impact (ex. changing the name of a national park).
 
 <<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5, cache=TRUE>>==
@@ -244,7 +245,7 @@ Most bills initiated in the Senate are either passed or rejected. One would thin
     ggtitle(expression(atop("Percentage of Bills Passed Per Year")))
   #ggsave("fig4.png", width = 11, height = 6, dpi = 600)
 @
-\subsection{Are bills that received unanimous votes typically passed or failed?}
+\subsection{Are Bills that Received Unanimous Votes Typically Passed or Failed?}
 A unanimously resolved bill is a bill that is either passed with fewer than 5 vetoes or rejected with fewer than 5 approvals. This plot shows that there are significantly more unanimously passed bills than failed bills, which is consistent with the fact that the majority of bills proposed in each of Congresses 101 through 113 were passed (4.2). The number of unanimously resolved bills per year is surprisingly high, perhaps because of the bipartisan nature of many bills.
 
 <<tidy=FALSE, echo=FALSE, out.height="3.5in", out.width="8in", fig.width=8, fig.height=3.5>>==
@@ -275,16 +276,16 @@ A unanimously resolved bill is a bill that is either passed with fewer than 5 ve
   #ggsave("fig5.png", width = 11, height = 6, dpi = 600)
 @
 \section{An Analysis of Voting Patterns Using Roll-Call Votes with Individual Senator Resolutions}
-In the previous section, we examined the overall trends in bill passage in the US Senate. For each of the roll-call votes we examined in our analysis, there is a corresponding list of each Senator’s vote: Yea or Nay. More content needed here…
-\subsection{Do Senators Vote Yea/Nay more in a given year?}
-Data on individual votes is consistent with roll-call vote data in that the majority of Senators in nearly if not all years from 1989-2014 vote yea more often than nay (4.3). However, investigation of the number of yae/nay votes of individual Senators is correlated with political party, as shown through the clustering of red dots in the figure below, each symbolizing one Republican Senator and the clustering of blue dots, each symbolizing one Democratic Senator, for each year. Certain years have more variance, which follows from a greater divide between party voting for a particular year. Years with a particularly great divide between the difference in yae and nae votes per Senator are 1993, 1995, 2005, and 2014. These difference may be due to political events, such as the Republican Revolution in 1995, during which the GOP experienced great  success in the US Midterm Elections (the plot shows a significantly greater number of yaes-nays for Republicans than for Democrats. For the majority of years from 1989-2015, the difference yae - nay for Democrats is greater than for Republicans, except between 1995 and 1999.
+In the previous section, we examined the overall trends in bill passage in the US Senate. For each of the roll-call votes we examined in our analysis, there is a corresponding list of each Senator’s vote: Yea or Nay. We retrieved this data from govtrack.org. Examining individual votes allows us to examine trends in variance of votes within a party and between parties, and this variance may be due to factors such as domestic affairs, politics, and foreign relations.
+\subsection{Do Senators Vote Yea/Nay more in a Given Year?}
+Data on individual votes is consistent with roll-call vote data in that the majority of Senators in nearly if not all years from 1989-2014 vote yea more often than nay (4.3). However, investigation of the number of yae/nay votes of individual Senators is correlated with political party, as shown through the clustering of red dots in the figure below, each symbolizing one Republican Senator and the clustering of blue dots, each symbolizing one Democratic Senator, for each year. Certain years have more variance, which follows from a greater divide between party voting for a particular year. Years with a particularly great divide between the difference in yae and nae votes per Senator are 1993, 1995, 2005, and 2014. These difference may be due to political events, such as the Republican Revolution in 1995, during which the GOP experienced great success in the US Midterm Elections (the plot shows a significantly greater number of yaes-nays for Republicans than for Democrats. For the majority of years from 1989-2015, the difference yae - nay for Democrats is greater than for Republicans, except between 1995 and 1999.
 
 <<echo=FALSE, warning=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE>>=
   votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
   votedatawide = dcast(votedata, id+year+party~vote, value.var="ct")
   votedatawide$diff = (votedatawide$Yea-votedatawide$Nay)
   ggplot(votedatawide, aes(x=as.factor(year), y=diff))+
-    geom_boxplot(outlier.colour = NULL)+
+    geom_boxplot()+
     geom_jitter(aes(color=party), alpha=.8)+
     scale_color_manual(name="Party", values=c("royal blue", "red"))+
     xlab("\nYear\n")+
@@ -317,9 +318,22 @@ For all of the Congresses examined, the majority of both Democratic and Republic
     ))
   #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
 @
-\section{Concluding Thoughts}
-Content needed here.
 \newpage
+\section{Concluding Thoughts}
+In accord with popular belief, the United States Senate is a bipartisan political body, as we proved. The Republican and Democratic parties constantly grapple for majority seats in both houses of Congress, as we showed that they do in the Senate. 
+
+With our plot on web platforms (3.1), we showed that the parties both adopt the technologies and in turn, perhaps social norms of their time. This provides insight into the possibility of the parties’ evolution over time. Republican and Democratic political platforms have transformed ever since the parties became the authorities of American politics in the 1800’s. The parties have become more similar in certain ways, such as by adopting a position of anti-slavery, but they have switched general positions on certain major issues such as on economic ideology. Our plot is a preliminary analysis of the fluid modernization of behavior and adoption of social norms of the US government. Techniques similar to the ones we used in our analysis of web platforms can be used on data about Republican and Democratic ideology and other political tools over time to increase transparency of the political parties that dominate US politics and their interactions with one another.
+
+There are several advantages to having a two-party system. Bipartisan governments generally tend to be more efficient and more easily managed than those with multiple parties, and two-party system may be the reason for the majority of bills being passed in the US Senate (4.3). In addition, a two-party system intuitively makes the voting system less complicated for voters. However, with only two options, voters may not entirely agree with either party. Gridlock is also a major concern, as is corruption. 
+
+With Senate seats held by Republicans and Democrats almost evenly with power shifting between parties over terms (3.3), gridlock has the potential to occur often and lead to the discontent of the American public with their government. Further analysis on the frequency of gridlock within the Senate and between the Senate, House of Republicans, and Executive Branch will reveal truths about the efficiency of the US bipartisan system. 
+
+Table 3.4 suggests the possibility of corruption in the US Senate through nepotism. In a country of 318 million individuals, the objective likelihood of relatives serving in the Senate is incredibly low, but the data shows that the phenomenon does in fact occur. Further analysis into individuals’ voting patterns on specific votes, the effects lobbying, and other political persuasion can gain more insight into the true extent of corruption in the US government. 
+
+Politics between Republicans and Democrats bleed into controversial domestic issues and topics such as gun control, abortion, and gay marriage as well as into foreign policy issues such as isolationism versus interventionism, wars, and international trade and economics. In order to fully achieve governmental transparency, a lengthy and deep analysis should be done on the hundreds or thousands of variables that may affect the legislative outcomes of Congress, as well as the outcomes of the Executive and Judicial branches of the US government. Our analysis of the US Senate is a preliminary investigation of the possibilities for achieving governmental transparency. The thought-process and techniques created and utilized in our report can sufficiently be used to model countless datasets in order to entirely lift the barrier between the US government and the people of the United States of America. 
+
+
+
 \section{Appendix}
 \subsection{Appendix A: Data fetching and Pre-processing}
 Three supplementary R files are included with this analysis. These contain the R code used to fetch and clean the data (divided by filetype) from our three sources:
