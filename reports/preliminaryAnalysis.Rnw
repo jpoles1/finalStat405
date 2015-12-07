@@ -277,7 +277,7 @@ A unanimously resolved bill is a bill that is either passed with fewer than 5 ve
 \section{An Analysis of Voting Patterns Using Roll-Call Votes with Individual Senator Resolutions}
 In the previous section, we examined the overall trends in bill passage in the US Senate. For each of the roll-call votes we examined in our analysis, there is a corresponding list of each Senator’s vote: Yea or Nay. More content needed here…
 \subsection{Do Senators Vote Yea/Nay more in a given year?}
-Content needed here.
+Data on individual votes is consistent with roll-call vote data in that the majority of Senators in nearly if not all years from 1989-2014 vote yea more often than nay (4.3). However, investigation of the number of yae/nay votes of individual Senators is correlated with political party, as shown through the clustering of red dots in the figure below, each symbolizing one Republican Senator and the clustering of blue dots, each symbolizing one Democratic Senator, for each year. Certain years have more variance, which follows from a greater divide between party voting for a particular year. Years with a particularly great divide between the difference in yae and nae votes per Senator are 1993, 1995, 2005, and 2014. These difference may be due to political events, such as the Republican Revolution in 1995, during which the GOP experienced great  success in the US Midterm Elections (the plot shows a significantly greater number of yaes-nays for Republicans than for Democrats. For the majority of years from 1989-2015, the difference yae - nay for Democrats is greater than for Republicans, except between 1995 and 1999.
 
 <<echo=FALSE, warning=FALSE, out.height="7in", out.width="8in", fig.width=8, fig.height=7, cache=TRUE>>=
   votedata = queryDB("SELECT id, party, vote, count(*) as ct, year FROM votes WHERE party in ('D', 'R') GROUP BY id, vote, year")
@@ -287,7 +287,7 @@ Content needed here.
     geom_boxplot()+
     geom_jitter(aes(color=party), alpha=.8)+
     scale_color_manual(name="Party", values=c("royal blue", "red"))+
-    xlab("\nCongress Number\n")+
+    xlab("\nYear\n")+
     ylab("\nDifference between Number of Yea/Nay Votes By Senator\n")+
     ggtitle(expression(
       atop("Number of Bills Approved By Senators Changes by Year", 
@@ -318,66 +318,6 @@ Content needed here.
   #ggsave("fig7.png", width = 11, height = 6, dpi = 600)
 @
 \newpage
-\subsection{How large is the disparity between yea votes by each major party?}
-Content needed here? Figure may need reworking.
-
-<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, warning=FALSE>>=
-  query = "select r.year as year, r.voteNumber as voteNumber,
-              (r.c - d.c) * 1.0 / (r.c + d.c) as diff 
-           from (select voteNumber, year, count(*) as c
-                 from votes 
-                 where vote == 'Yea' and party == 'R' group by year, voteNumber)
-                 as r
-                join
-	              (select voteNumber, year, count(*) as c 
-                 from votes 
-                 where vote == 'Yea' and party == 'D' group by year, voteNumber)
-                 as d
-	              on r.voteNumber == d.voteNumber and r.year == d.year"
-  yeaDiff = queryDB(query, "data.sqlite")
-  yeaDiffMean = setNames(aggregate(diff ~ year, yeaDiff, mean), c("year", "mean"))
-  yeaDiffSd = setNames(aggregate(diff ~ year, yeaDiff, sd), c("year", "std"))
-  yeaDiffDistribution = merge(yeaDiffMean, yeaDiffSd, by="year")
-  ggplot(yeaDiffDistribution) +
-  aes(x = year, y = mean, group = 1, colour = 'Red') +
-  scale_x_discrete(breaks=c(1989,1994,1999,2004,2009,2014)) +
-  labs(title="Mean of difference of 'yea' votes of two majority parties 
-       \ndivided by total 'yea' votes from 1989 to 2014") +
-  xlab("Year") +
-  ylab("Mean difference of each year") +
-  geom_line() +
-  geom_point()
-@
-
-<<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, warning=FALSE>>=
-query = "select r.year as year, r.voteNumber as voteNumber,
-              r.c * 1.0 / (r.c + d.c) as rpercent, d.c * 1.0 / (r.c + d.c) as dpercent 
-           from (select voteNumber, year, count(*) as c
-                 from votes 
-                 where vote == 'Yea' and party == 'R' group by year, voteNumber)
-                 as r
-                join
-	              (select voteNumber, year, count(*) as c 
-                 from votes 
-                 where vote == 'Yea' and party == 'D' group by year, voteNumber)
-                 as d
-	              on r.voteNumber == d.voteNumber and r.year == d.year"
-  yeaPercentage = queryDB(query, "data.sqlite")
-  RepYeaPercentageMean = setNames(aggregate(rpercent ~ year, yeaPercentage, mean), c("year", "mean"))
-  RepYeaPercentageMean$party = rep(c('Republican'), times=length(RepYeaPercentageMean))
-  DemYeaPercentageMean = setNames(aggregate(dpercent ~ year, yeaPercentage, mean), c("year", "mean"))
-  DemYeaPercentageMean$party = rep(c('Democratic'), times=length(DemYeaPercentageMean))
-  yeaPercentageMean = rbind(RepYeaPercentageMean, DemYeaPercentageMean)
-  ggplot(yeaPercentageMean) +
-  aes(x = year, y = mean, group = party, colour = party) +
-  scale_x_discrete(breaks=c(1989,1994,1999,2004,2009,2014)) +
-  labs(title="Average Percentage of 'yea' Votes of two majority parties 
-       \nin total 'yea' votes from 1989 to 2014") +
-  xlab("Year") +
-  ylab("Percentage of 'yea' votes") +
-  geom_line() +
-  geom_point()  
-  @
 \section{Concluding Thoughts}
 Content needed here.
 \section{Appendix}
