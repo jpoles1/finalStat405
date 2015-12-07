@@ -375,8 +375,16 @@ query = "select r.year as year, r.voteNumber as voteNumber,
 Content needed here.
 \section{Appendix}
 \subsection{Appendix A: Data fetching and Pre-processing}
-Two supplementary R files are included with this analysis. These contain the R code used to fetch the data (divided by filetype) from our three sources:
-\begin{enumerate}
-  \item congressAPI.R - This Script fetches all of the datasets and stores them in a SQLite database file (data.sqlite). The fetching and handling JSON files from 
-\end{enumerate}
+Three supplementary R files are included with this analysis. These contain the R code used to fetch and clean the data (divided by filetype) from our three sources:
+
+\href{}{fetchJSON.R} - This script contains the functions required to download data from the New York Times Congress and govtrack.org role-call vote APIs:
+  \begin{enumerate}
+    
+  \end{enumerate}
+fetchXML.R 
+  \begin{enumerate}
+  \end{enumerate}
+fetchData.R - This Script fetches all of the datasets and stores them in a SQLite database file (data.sqlite). The fetching and handling JSON files from 
+
+
 \end{document}
