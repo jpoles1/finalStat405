@@ -604,4 +604,48 @@ Do Senators Vote Yea/Nay more in a Given Year?
 \newpage
 \subsection{Appendix C: Code for Generating Animated .gifs for Time Series Vizualization}
 
+During the course of our analysis, we were struggling to find means of vizualizing time-scale state-level data like change in average missed votes by senators of each state over time; or state political preference over time. The typical chloropleth map (where each state is filled with a color determined by a variable) only allows for two dimensions to be vizualized: state, and variable level. Should we wish to use time we might instead have to use averages over time (which eliminates some resolution of the data during exploration).
+
+In \href{https://github.com/jpoles1/finalStat405/blob/master/figures/mapSeries/series.R}{series.R} we present a simple technique which generates (using the ggmap package) and saves sequential chloropleth maps. These maps are then stitched together by one of any number of applications in order to create an animated gif (we use the ImageMagick toolkit, which comes pre-installed on Xubuntu). For example, we will look at senator miss rate by state over time:
+
+\subsubsection{First we generate a series of plots and save them to disk:}
+
+<<eval=FALSE>>==
+stateMap = map_data("state")
+congressRange = 101:113
+alldata = queryDB("SELECT state as stateAbrev, avg(missed_votes_pct) as missed, congressNumber 
+                  FROM members  
+                  GROUP BY congressNumber, state 
+                  ORDER BY congressNumber DESC, missed DESC")
+upperbound = ceiling(mean(alldata$missed)+(2*sd(alldata$missed)))
+for(congressNumber in congressRange){
+  stateVote = queryDB(sprintf("
+    SELECT state as stateAbrev, avg(missed_votes_pct) as missed 
+    FROM members 
+    WHERE congressNumber=%s 
+    GROUP BY state",congressNumber))
+  stateVote$state = apply(stateVote, 1, FUN=function(x){stateAbrevToFull(x["stateAbrev"])})
+  uniScale = seq(60, 100, by=5);
+  ggplot()+
+    geom_map(data=stateMap, map=stateMap, aes(x=long, y=lat, map_id=region), fill="#ffffff", color="grey10")+
+    geom_map(data=stateVote, map=stateMap, aes(fill=missed, map_id=state), color="grey10")+
+    ggtitle(sprintf("Avg. Percentage of Votes Missed by State Senators\nCongress Number: %s\n", congressNumber))+
+    xlab("")+ylab("")+
+    scale_x_continuous(breaks=NULL)+
+    scale_y_continuous(breaks=NULL)+
+    scale_fill_gradient(name="% Missed Votes", limits=c(0,upperbound), na.value="dark red")
+  ggsave(file=sprintf("../figures/mapSeries/missed/%s.png", congressNumber), width= 10, height=6, dpi=200)
+}
+@
+
+\subsubsection{Then we generate the gif:}
+
+Execute \href{https://github.com/jpoles1/finalStat405/blob/master/figures/mapSeries/animate.sh}{animate.sh}
+This file should be in the folder containing the generated images. The file contains the following command:
+<<eval=FALSE>>==
+  convert -delay 100 -loop 0 *.png map.gif
+@
+
+\subsubsection{\href{https://raw.githubusercontent.com/jpoles1/finalStat405/master/figures/mapSeries/missed/map.gif}{View the final product here!}}
+
 \end{document}
