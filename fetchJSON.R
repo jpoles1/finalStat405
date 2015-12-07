@@ -23,11 +23,6 @@ fetchCongressMembers = function(congressNumber=113, chamber="senate", searchpara
   data = fetchJSON(dataurl)$results$members[[1]]
   return(data)
 }
-tableWriter = function(data, tablename){
-  dbcon = dbConnect(SQLite(), dbname="data.sqlite")
-  dbWriteTable(dbcon, tablename, data, overwrite=TRUE);
-  dbDisconnect(dbcon);
-}
 fetchAllMembers = function(congressRange, chamber="senate"){
   data = data.frame()
   for(num in congressRange){
@@ -37,11 +32,6 @@ fetchAllMembers = function(congressRange, chamber="senate"){
   }
   tableWriter(data, "members")
   return(data)
-}
-fetchBills = function(congressNumber=113, chamber="senate", searchparams=""){
-  dataurl = sprintf("http://api.nytimes.com/svc/politics/%s/us/legislative/congress/%s/%s/bills/passed.json?%s&api-key=%s", apiversion, congressNumber, chamber, searchparams, apikey)
-  data = fetchJSON(dataurl)$results
-  return(data) 
 }
 fetchVote = function(congressNumber=113, year = 2015, rollNumber=1, searchparams=""){
   dataurl = sprintf("https://www.govtrack.us/data/congress/%s/votes/%s/s%s/data.json", congressNumber, year, rollNumber)
