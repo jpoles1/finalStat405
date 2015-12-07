@@ -115,6 +115,9 @@ This figure is the culmination of an analysis of the power held by each of the p
 @
 \subsection{How often do multiple senators share a surname?}
 There are 12 surnames held by more than one Senator over time in the Congresses examined. Several Senators who share a surname are related, indicating the possibility of some degree of nepotism in the Senate. For instance, in Rhode Island, the Chafee family has held Senate seats for over three decades. John Chafee (R) held the seat from 1976-1999,\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=c000269}} and his son Lincoln Chafee (R) (who made a run for President in 2016 but has already dropped out) held the seat directly after him from 1999-2007.\footnote{\href{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}{http://bioguide.congress.gov/scripts/biodisplay.pl?index=C001040}} This suggests that some families have a high level of power in US governance (another instance is the Clinton Family).
+\newline
+\newline
+\textbf{Number of Senators who Share the Same Last Name}
 <<echo=FALSE, results='asis'>>==
   lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC")
   lastCounts = lastCounts[lastCounts$lastct>1,]
@@ -164,11 +167,15 @@ Over the course of the period examined, many states elected similar numbers of S
 @
 \subsection{Who are the independent senators? Where are they elected?}
 Given that independent Senators are a small cohort, we decided that the independent senators deserved some analytical consideration. We note that the majority of elections won by independent Senators are in the state of Vermont (VT) and that there are a small overall number of candidates per number of elections won. Senator Barkley (I) had a small number of votes. Further research revealed that he temporarily held the chair of Senator Paul Wellstone, who died in a plane crash.\footnote{\href{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}{http://www.nytimes.com/2002/10/25/politics/25CND-CRASH.html}}
-
+\newline
+\newline
+\begin{center}
+\textbf{Independents of the 101st to 113th Senates}
+\end{center}
 <<echo=FALSE, results='asis'>>==
   indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state")
   colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
-  print(xtable(indep))
+  print(xtable(indep), include.rownames = FALSE)
 @
 \newpage
 \section{Examining Patterns in Bill Passage}
