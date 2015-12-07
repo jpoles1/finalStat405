@@ -40,6 +40,7 @@ The United States government is said to be by the people, of the people, and for
   require(xtable)
   source("../config.R")
   source("../voteAnalysis.R")
+  getwd()
 @
 \section{Examining The Members of Senate}
 The NY Times Congress API provides an interface for accessing a number of characteristics on US Senators including their web presence, party and voting patterns. This provides us some introductory insights into the behavior of politicians elected by the US citizenry to represent them in the federal government.
@@ -102,7 +103,7 @@ This figure is the culmination of an analysis of the power held by each of the p
     SELECT party as Party, congressNumber, count(*) as ct
     FROM members
     GROUP BY party, congressNumber
-  ")
+  ", "data.sqlite")
   ggplot(partyDataByYear, aes(x=congressNumber, y=ct, fill=Party))+
     scale_fill_manual(name = "Party", values = c("#4169E1", "green", "dark blue", "#FF0000"))+
     geom_histogram(position="fill", stat="identity", width=1)+
@@ -119,7 +120,7 @@ There are 12 surnames held by more than one Senator over time in the Congresses 
 \newline
 \textbf{Number of Senators who Share the Same Last Name}
 <<echo=FALSE, results='asis'>>==
-  lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC")
+  lastCounts=queryDB("SELECT tab.last_name as last, count(*) as lastct FROM (SELECT id, (last_name || ', ' || first_name) AS full_name, last_name, count(last_name) as ct FROM members GROUP BY full_name ORDER BY ct) AS tab GROUP BY last ORDER BY lastct DESC", "data.sqlite")
   lastCounts = lastCounts[lastCounts$lastct>1,]
   colnames(lastCounts) = c("Last Name", "# of Senators")
   print(xtable(t(lastCounts)), include.colnames=FALSE)
@@ -133,7 +134,7 @@ Over the course of the period examined, many states elected similar numbers of S
     SELECT state as stateAbrev, party, count(*) as ct
     FROM members
     WHERE party IN ('D', 'R') GROUP BY party, state
-  ")
+  ", "data.sqlite")
   statePartyWide = dcast(stateParty, stateAbrev~party, value.var="ct")
   statePartyWide[is.na(statePartyWide)]=0
   statePartyWide$diff = statePartyWide$D-statePartyWide$R
@@ -153,7 +154,7 @@ Over the course of the period examined, many states elected similar numbers of S
   #ggsave("fig3.png", width = 10, height = 6, dpi = 600)
 @
 <<out.height="2in", out.width="8in", fig.width=8, fig.height=2, echo=FALSE, eval=FALSE>>==
-  stateParty = queryDB(paste("SELECT state as stateAbrev, party, count(*) as ct", "FROM members", "WHERE party IN ('D', 'R', 'I') GROUP BY party, state"))
+  stateParty = queryDB(paste("SELECT state as stateAbrev, party, count(*) as ct", "FROM members", "WHERE party IN ('D', 'R', 'I') GROUP BY party, state"), "data.sqlite")
   stateParty$state = apply(stateParty, 1, FUN=function(x){stateAbrevToFull(x["stateAbrev"])})
   stateMap = map_data("state")
   ggplot()+
@@ -173,7 +174,7 @@ Given that independent Senators are a small cohort, we decided that the independ
 \textbf{Independents of the 101st to 113th Senates}
 \end{center}
 <<echo=FALSE, results='asis'>>==
-  indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state")
+  indep = queryDB("SELECT (first_name || ' ' || last_name) as fullName, state, congressNumber, total_votes FROM members WHERE party='I' ORDER BY state", "data.sqlite")
   colnames(indep) = c("Name", "State", "Congress #", "Total Votes")
   print(xtable(indep), include.rownames = FALSE)
 @
@@ -302,7 +303,7 @@ Data on individual votes is consistent with roll-call vote data in that the majo
 For all of the Congresses examined, the majority of both Democratic and Republican Senators voted over 80 percent of the time with their party. There is a small and steady increase between Congresses 101 and 109 in Senators voting with their party. In Congress 110, a discrepancy emerged: most Democrats began to vote 90 percent of the time or more with their party, while most Republicans fell to voting under 90 percent of the time with their party. This trend may correlate with the Obama presidency, which began in 2008 (Congress 110 began in 2007). 
 
 <<echo=FALSE, out.height="4.5in", out.width="8in", fig.width=8, fig.height=4.5, cache=TRUE, warning=FALSE>>=
-  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')")
+  memberPct = queryDB("SELECT id, party, missed_votes_pct as missed, votes_with_party_pct as withParty, next_election as nextElection, congressNumber FROM members WHERE party in ('D', 'R')", "data.sqlite")
   memberPct$withParty = as.integer(as.character(memberPct$withParty))
   memberPct$congressNumber = as.factor(memberPct$congressNumber)
   ggplot(memberPct, aes(x=congressNumber, y=withParty, fill=party))+
