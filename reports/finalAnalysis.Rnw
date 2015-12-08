@@ -11,7 +11,7 @@
 }
 \begin{document}
 \title{A Retrospective Exploration of the US Senate through Data}
-\author{Jordan Poles, Tony Chen, and Aparna Narendrula}
+\author{Jordan Poles, Xiaoyu Chen, and Aparna Narendrula}
 \maketitle
 \section{An Introduction to the Data}
 This report details our analysis of a dataset on politics that covers the 101st to the 113th US Congresses (1989 - 2014). The dataset was extracted from several sources, and allowed us to assess trends in the members of the US Congress, their voting patterns and bills passed by this body. We focused on understanding the US Senate, which is one of the two chambers of Congress (the other being the House of Representatives). We selected the Senate for two reasons:
