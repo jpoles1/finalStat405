@@ -1,5 +1,7 @@
 #Repository for STAT 405 Final Project Code
-##Database
+This repository contains the code for a colaborative final project produced for Rice University's STAT 405 (Statistical Computing and Graphics) course. It is intended as an exploratory analysis of a US Senate dataset extracted from three major sources (NYTimes Congress API; senate.gov; and govtrack.us).
+####You can read all about our work in our [final report](https://github.com/jpoles1/finalStat405/raw/master/reports/finalAnalysis.pdf).
+##Database (data.sqlite)
 We have finally gotten our database up and running. It includes 3 tables:
 - Members (members): A list of the members of congress, sourced from the NY Times Congress API
   - Contains metadata such as name, party, state
